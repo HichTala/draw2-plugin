@@ -1,6 +1,6 @@
 /*
-Plugin Name
-Copyright (C) <Year> <Developer> <Email Address>
+Detecting and Recognizing A Wide range of cards (DRAW) v2 - plugin for OBS Studio
+Copyright (C) 2025 HichTala hich.tala.phd@gmail.com
 
 This program is free software; you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
