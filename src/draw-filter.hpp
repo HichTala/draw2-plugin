@@ -1,0 +1,18 @@
+//
+// Created by HichTala on 23/06/25.
+//
+
+#ifndef DRAW_FILTER_HPP
+#define DRAW_FILTER_HPP
+
+#include <obs-module.h>
+#include <obs-source.h>
+
+static const char* draw_filter_get_name(void *type_data);
+static void* draw_filter_create(obs_data_t *settings, obs_source_t *source);
+static void draw_filter_destroy(void *data);
+uint32_t draw_filter_get_height(void *data);
+uint32_t draw_filter_get_width(void *data);
+void draw_filter_get_defaults(obs_data_t *settings);
+
+#endif //DRAW_FILTER_HPP

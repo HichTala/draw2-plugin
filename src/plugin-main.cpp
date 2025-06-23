@@ -22,6 +22,8 @@ with this program. If not, see <https://www.gnu.org/licenses/>
 #include <QWidget>
 #include "DrawDock.hpp"
 
+extern struct obs_source_info draw_filter;
+
 OBS_DECLARE_MODULE()
 OBS_MODULE_USE_DEFAULT_LOCALE(PLUGIN_NAME, "en-US")
 
@@ -31,6 +33,7 @@ bool obs_module_load(void)
 	auto *dock = new DrawDock(main_window);
 
 	obs_frontend_add_dock_by_id("drawDock", obs_module_text("Draw 2"), dock);
+	obs_register_source(&draw_filter);
 	obs_log(LOG_INFO, "plugin loaded successfully (version %s)", PLUGIN_VERSION);
 	return true;
 }

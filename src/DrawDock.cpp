@@ -13,8 +13,8 @@ DrawDock::DrawDock(QWidget *parent) : QWidget(parent)
 	this->setProperty("class", "dock-widget");
 
 	auto *layout = new QHBoxLayout(this);
-	layout->setContentsMargins(0, 0, 0, 0);
-	layout->setSpacing(1);
+	layout->setContentsMargins(5, 4, 5, 4);
+	layout->setSpacing(4);
 
 	this->start_button->setText("Start Draw");
 	this->start_button->setCheckable(true);

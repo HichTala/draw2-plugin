@@ -15,7 +15,10 @@ add_library(${CMAKE_PROJECT_NAME} MODULE
         src/DrawDock.cpp
         src/DrawDock.hpp
         src/SettingsDialog.cpp
-        src/SettingsDialog.hpp)
+        src/SettingsDialog.hpp
+        src/draw-filter.cpp
+        src/draw-filter.hpp
+)
 
 find_package(libobs REQUIRED)
 target_link_libraries(${CMAKE_PROJECT_NAME} PRIVATE OBS::libobs)
