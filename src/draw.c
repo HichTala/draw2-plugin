@@ -2,7 +2,7 @@
 // Created by HichTala on 23/06/25.
 //
 
-#include "draw.hpp"
+#include "draw.h"
 
 #include "plugin-support.h"
 #include <graphics/graphics.h>
@@ -42,7 +42,7 @@ const char *draw_source_get_name(void *type_data)
 void *draw_filter_create(obs_data_t *settings, obs_source_t *source)
 {
 	UNUSED_PARAMETER(settings);
-	auto *filter = static_cast<draw_filter_data_t *>(bzalloc(sizeof(draw_filter_data_t)));
+	draw_filter_data_t *filter = (draw_filter_data_t *)(bzalloc(sizeof(draw_filter_data_t)));
 
 	filter->source = source;
 
@@ -51,7 +51,7 @@ void *draw_filter_create(obs_data_t *settings, obs_source_t *source)
 void *draw_source_create(obs_data_t *settings, obs_source_t *source)
 {
 	UNUSED_PARAMETER(settings);
-	auto *source_data = static_cast<draw_source_data_t *>(bzalloc(sizeof(draw_source_data_t)));
+	draw_source_data_t *source_data = (draw_source_data_t *)(bzalloc(sizeof(draw_source_data_t)));
 
 	source_data->source = source;
 	source_data->height = 391;
@@ -61,19 +61,19 @@ void *draw_source_create(obs_data_t *settings, obs_source_t *source)
 }
 void draw_filter_destroy(void *data)
 {
-	auto *filter = static_cast<draw_filter_data_t *>(data);
+	draw_filter_data_t *filter = (draw_filter_data_t *)(data);
 
 	bfree(filter);
 }
 
 uint32_t draw_source_get_height(void *data)
 {
-	auto *source_data = static_cast<draw_source_data_t *>(data);
+	draw_source_data_t *source_data = (draw_source_data_t *)(data);
 	return source_data->height;
 }
 uint32_t draw_source_get_width(void *data)
 {
-	auto *source_data = static_cast<draw_source_data_t *>(data);
+	draw_source_data_t *source_data = (draw_source_data_t *)(data);
 	return source_data->width;
 }
 
