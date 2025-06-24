@@ -8,6 +8,12 @@
 #include <obs-module.h>
 #include <obs-source.h>
 
+struct draw_filter_data {
+	obs_source_t *source;
+
+};
+typedef struct draw_filter_data draw_filter_data_t;
+
 static const char* draw_filter_get_name(void *type_data);
 static void* draw_filter_create(obs_data_t *settings, obs_source_t *source);
 static void draw_filter_destroy(void *data);

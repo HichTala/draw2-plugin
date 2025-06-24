@@ -16,8 +16,8 @@ add_library(${CMAKE_PROJECT_NAME} MODULE
         src/DrawDock.hpp
         src/SettingsDialog.cpp
         src/SettingsDialog.hpp
-        src/draw-filter.cpp
-        src/draw-filter.hpp
+        src/draw.cpp
+        src/draw.hpp
 )
 
 find_package(libobs REQUIRED)
