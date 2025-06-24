@@ -1,9 +1,9 @@
 //
-// Created by HichTala on 23/06/25.
+// Created by HichTala on 24/06/25.
 //
 
-#ifndef DRAW_FILTER_HPP
-#define DRAW_FILTER_HPP
+#ifndef DRAW_H
+#define DRAW_H
 
 #include <obs-module.h>
 #include <obs-source.h>
@@ -23,7 +23,8 @@ struct draw_source_data {
 typedef struct draw_source_data draw_source_data_t;
 
 extern struct obs_source_info draw_filter;
-extern struct obs_source_info draw_source;static const char *draw_filter_get_name(void *type_data);
+extern struct obs_source_info draw_source;
+static const char *draw_filter_get_name(void *type_data);
 
 const char *draw_source_get_name(void *type_data);
 void *draw_filter_create(obs_data_t *settings, obs_source_t *source);
@@ -34,4 +35,4 @@ uint32_t draw_source_get_width(void *data);
 void draw_filter_get_defaults(obs_data_t *settings);
 void draw_source_video_render(void *data, gs_effect_t *effect);
 
-#endif //DRAW_FILTER_HPP
+#endif //DRAW_H
