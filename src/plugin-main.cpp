@@ -26,8 +26,6 @@ extern "C" {
 #include "draw.h"
 }
 
-
-
 OBS_DECLARE_MODULE()
 OBS_MODULE_USE_DEFAULT_LOCALE(PLUGIN_NAME, "en-US")
 
