@@ -44,6 +44,8 @@ uint32_t draw_source_get_height(void *data);
 uint32_t draw_source_get_width(void *data);
 void draw_filter_get_defaults(obs_data_t *settings);
 void draw_source_video_render(void *data, gs_effect_t *effect);
+bool enum_cb(obs_scene_t *scene, obs_sceneitem_t *item, void *param);
+bool scene_contains_source(obs_source_t *source);
 bool add_source_to_list(void *data, obs_source_t *source);
 static bool draw_source_type_changed(obs_properties_t *props, obs_property_t *list, obs_data_t *settings);
 obs_properties_t *draw_source_get_properties(void *data);

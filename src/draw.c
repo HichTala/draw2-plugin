@@ -24,7 +24,7 @@ struct obs_source_info draw_source = {.id = "draw_source",
 				      .get_width = draw_source_get_width,
 				      .get_height = draw_source_get_height,
 				      .get_defaults = draw_filter_get_defaults,
-				      .video_render = draw_source_video_render,
+				      // .video_render = draw_source_video_render,
 				      .get_properties = draw_source_get_properties,
 				      .update = draw_source_update,
 				      .icon_type = OBS_ICON_TYPE_COLOR};
@@ -125,29 +125,63 @@ void draw_source_video_render(void *data, gs_effect_t *effect)
 	if (!captured_frame)
 		return;
 
-	if (!effect)
-		return;
-
-	gs_effect_set_texture(gs_effect_get_param_by_name(effect, "image"), captured_frame);
-
-	gs_technique_t *tech = gs_effect_get_technique(effect, "Draw");
-	if (!tech)
-		return;
-
-	size_t passes = gs_technique_begin(tech);
-	for (size_t i = 0; i < passes; i++) {
-		if (gs_technique_begin_pass(tech, i)) {
-			gs_draw_sprite(captured_frame, 0, source_data->width, source_data->height);
-			gs_technique_end_pass(tech);
-		}
-	}
-	gs_technique_end(tech);
+	// if (!effect)
+	// 	return;
+	//
+	// gs_effect_set_texture(gs_effect_get_param_by_name(effect, "image"), captured_frame);
+	//
+	// gs_technique_t *tech = gs_effect_get_technique(effect, "Draw");
+	// if (!tech)
+	// 	return;
+	//
+	// size_t passes = gs_technique_begin(tech);
+	// for (size_t i = 0; i < passes; i++) {
+	// 	if (gs_technique_begin_pass(tech, i)) {
+	// 		gs_draw_sprite(captured_frame, 0, source_data->width, source_data->height);
+	// 		gs_technique_end_pass(tech);
+	// 	}
+	// }
+	// gs_technique_end(tech);
 	gs_texture_destroy(captured_frame);
+}
+bool enum_cb(obs_scene_t *scene, obs_sceneitem_t *item, void *param)
+{
+	UNUSED_PARAMETER(scene);
+	obs_source_t *source = obs_sceneitem_get_source(item);
+	bool *found = param;
+	const char *source_id = obs_source_get_id(source);
+
+	obs_log(LOG_INFO, "%s", source_id);
+
+	if (strcmp(source_id, "draw_source") == 0) {
+		*found = true;
+		return false;
+	}
+	return true;
+}
+bool scene_contains_source(obs_source_t *source)
+{
+	if (!source)
+		return false;
+	if (strcmp(obs_source_get_id(source), "scene") != 0)
+		return false;
+
+	const char *scene_name = obs_source_get_name(source);
+	obs_log(LOG_INFO, "%s", scene_name);
+
+	bool found = false;
+
+	obs_scene_t *scene_data = obs_scene_from_source(source);
+	obs_scene_enum_items(scene_data, enum_cb, &found);
+	return found;
 }
 bool add_source_to_list(void *data, obs_source_t *source)
 {
+	if (scene_contains_source(source))
+		return true;
 	obs_property_t *p = data;
 	const char *name = obs_source_get_name(source);
+	obs_log(LOG_INFO, "%s", name);
 	size_t count = obs_property_list_item_count(p);
 	size_t idx = 0;
 	while (idx < count && strcmp(name, obs_property_list_item_string(p, idx)) > 0)
@@ -227,19 +261,25 @@ gs_texture_t *capture_source_frame(obs_source_t *source)
 		return NULL;
 
 	const char *source_id = obs_source_get_id(source);
-	if (strcmp(source_id, "draw_source") == 0) {
+	const char *source_name = obs_source_get_name(source);
+	obs_log(LOG_INFO, "%s", source_name);
+	if (!source_id || strcmp(source_id, "draw_source") == 0)
 		return NULL;
-	}
 
 	uint32_t width = obs_source_get_width(source);
 	uint32_t height = obs_source_get_height(source);
 
-	gs_texture_t *texture = gs_texture_create(width, height, GS_RGBA, 1, NULL, GS_DYNAMIC);
-	if (!texture)
+	// Prevent invalid texture sizes
+	if (width == 0 || height == 0)
 		return NULL;
 
 	gs_texrender_t *texrender = gs_texrender_create(GS_RGBA, GS_ZS_NONE);
+	if (!texrender)
+		return NULL;
+
 	gs_texrender_reset(texrender);
+
+	gs_texture_t *texture = NULL;
 
 	if (gs_texrender_begin(texrender, width, height)) {
 		struct vec4 background;
@@ -248,11 +288,19 @@ gs_texture_t *capture_source_frame(obs_source_t *source)
 		gs_clear(GS_CLEAR_COLOR, &background, 0.0f, 0);
 		gs_ortho(0.0f, (float)width, 0.0f, (float)height, -100.0f, 100.0f);
 
-		// obs_source_video_render(source);
+		if (obs_source_active(source) && !obs_source_removed(source)) {
+			obs_source_video_render(source);
+		}
 
 		gs_texrender_end(texrender);
 
-		gs_copy_texture(texture, gs_texrender_get_texture(texrender));
+		gs_texture_t *src_tex = gs_texrender_get_texture(texrender);
+		if (src_tex) {
+			texture = gs_texture_create(width, height, GS_RGBA, 1, NULL, GS_DYNAMIC);
+			if (texture) {
+				gs_copy_texture(texture, src_tex);
+			}
+		}
 	}
 
 	gs_texrender_destroy(texrender);
