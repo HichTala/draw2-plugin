@@ -20,10 +20,15 @@ add_library(
   src/SettingsDialog.hpp
   src/draw.c
   src/draw.h
+        src/utils.cpp
+        src/utils.hpp
 )
 
 find_package(libobs REQUIRED)
+find_package( OpenCV REQUIRED )
+include_directories(${OpenCV_INCLUDE_DIRS})
 target_link_libraries(${CMAKE_PROJECT_NAME} PRIVATE OBS::libobs)
+target_link_libraries( ${PROJECT_NAME} PRIVATE ${OpenCV_LIBS} )
 target_compile_features(${CMAKE_PROJECT_NAME} PUBLIC cxx_std_20)
 
 if(ENABLE_FRONTEND_API)
