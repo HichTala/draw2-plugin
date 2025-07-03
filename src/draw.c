@@ -6,7 +6,6 @@
 
 #include "plugin-support.h"
 #include <graphics/graphics.h>
-#include <opencv2/core.hpp>
 
 struct obs_source_info draw_filter = {.id = "draw_filter",
 				      .type = OBS_SOURCE_TYPE_FILTER,
@@ -66,9 +65,6 @@ void *draw_source_create(obs_data_t *settings, obs_source_t *source)
 	source_data->minimum_out_of_screen_time = 0;
 	source_data->threshold_confidence_score = 0;
 
-	source_data->texrender = gs_texrender_create(GS_RGBA, GS_ZS_NONE);
-	source_data->output_texture = NULL;
-
 	return source_data;
 }
 void draw_filter_destroy(void *data)
@@ -86,16 +82,6 @@ void draw_source_destroy(void *data)
 
 	if (source_data->input_selection)
 		bfree(source_data->input_selection);
-
-	if (source_data->output_texture) {
-		gs_texture_destroy(source_data->output_texture);
-		source_data->output_texture = NULL;
-	}
-
-	if (source_data->texrender) {
-		gs_texrender_destroy(source_data->texrender);
-		source_data->texrender = NULL;
-	}
 
 	bfree(source_data);
 }
@@ -131,19 +117,19 @@ void draw_source_video_render(void *data, gs_effect_t *effect)
 		return;
 	}
 
-	capture_source_frame(source_data, selected_source);
+	gs_texture_t *captured_frame = capture_source_frame(selected_source);
 	source_data->height = obs_source_get_height(selected_source);
 	source_data->width = obs_source_get_width(selected_source);
 	obs_source_release(selected_source);
 
-	if (!source_data->output_texture)
+	if (!captured_frame)
 		return;
 
 	gs_effect_t *default_effect = obs_get_base_effect(OBS_EFFECT_DEFAULT);
 	if (!default_effect)
 		return;
 
-	gs_effect_set_texture(gs_effect_get_param_by_name(default_effect, "image"), source_data->output_texture);
+	gs_effect_set_texture(gs_effect_get_param_by_name(default_effect, "image"), captured_frame);
 
 	gs_technique_t *tech = gs_effect_get_technique(default_effect, "Draw");
 	if (!tech)
@@ -152,7 +138,7 @@ void draw_source_video_render(void *data, gs_effect_t *effect)
 	size_t passes = gs_technique_begin(tech);
 	for (size_t i = 0; i < passes; i++) {
 		if (gs_technique_begin_pass(tech, i)) {
-			gs_draw_sprite(source_data->output_texture, 0, source_data->width, source_data->height);
+			gs_draw_sprite(captured_frame, 0, source_data->width, source_data->height);
 			gs_technique_end_pass(tech);
 		}
 	}
@@ -264,32 +250,37 @@ void draw_source_update(void *data, obs_data_t *settings)
 	source_data->minimum_out_of_screen_time = (uint32_t)obs_data_get_int(settings, "minimum_out_of_screen_time");
 	source_data->threshold_confidence_score = (uint32_t)obs_data_get_int(settings, "threshold_confidence_score");
 }
-void capture_source_frame(void *data, obs_source_t *source)
+gs_texture_t *capture_source_frame(obs_source_t *source)
 {
-	draw_source_data_t *source_data = data;
 	if (!source)
-		return;
+		return NULL;
 
 	const char *source_id = obs_source_get_id(source);
-	if (!source_id)
-		return;
 
-	uint32_t width = source_data->width;
-	uint32_t height = source_data->height;
+	if (!source_id || strcmp(source_id, "draw_source") == 0)
+		return NULL;
+
+	uint32_t width = obs_source_get_width(source);
+	uint32_t height = obs_source_get_height(source);
+
 	if (width == 0 || height == 0)
-		return;
+		return NULL;
 
 	gs_texrender_t *texrender = gs_texrender_create(GS_RGBA, GS_ZS_NONE);
 	if (!texrender)
-		return;
+		return NULL;
 
 	gs_texrender_reset(texrender);
+
+	gs_texture_t *texture = NULL;
 
 	if (gs_texrender_begin(texrender, width, height)) {
 		struct vec4 background;
 		vec4_zero(&background);
+
 		gs_clear(GS_CLEAR_COLOR, &background, 0.0f, 0);
 		gs_ortho(0.0f, (float)width, 0.0f, (float)height, -100.0f, 100.0f);
+		obs_source_video_render(source);
 
 		gs_texrender_end(texrender);
 
@@ -299,21 +290,9 @@ void capture_source_frame(void *data, obs_source_t *source)
 			if (texture) {
 				gs_copy_texture(texture, src_tex);
 			}
-		} else {
-			obs_source_video_render(source); // Safe for other sources
-		}
-
-		gs_texrender_end(texrender);
-
-		if (source_data->output_texture)
-			gs_texture_destroy(source_data->output_texture);
-
-		source_data->output_texture = gs_texture_create(width, height, GS_RGBA, 1, NULL, GS_DYNAMIC);
-		if (source_data->output_texture) {
-			gs_copy_texture(source_data->output_texture, gs_texrender_get_texture(texrender));
 		}
 	}
 
 	gs_texrender_destroy(texrender);
+	return texture;
 }
-
