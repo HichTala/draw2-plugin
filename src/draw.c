@@ -71,77 +71,11 @@ void draw_source_get_defaults(obs_data_t *settings)
 {
 	UNUSED_PARAMETER(settings);
 }
-static const char *get_tech_name_and_multiplier(enum gs_color_space current_space, enum gs_color_space source_space,
-						float *multiplier)
-{
-	const char *tech_name = "Draw";
-	*multiplier = 1.f;
-
-	switch (source_space) {
-	case GS_CS_SRGB:
-	case GS_CS_SRGB_16F:
-		switch (current_space) {
-		case GS_CS_709_SCRGB:
-			tech_name = "DrawMultiply";
-			*multiplier = obs_get_video_sdr_white_level() / 80.0f;
-		default:;
-		}
-		break;
-	case GS_CS_709_EXTENDED:
-		switch (current_space) {
-		case GS_CS_SRGB:
-		case GS_CS_SRGB_16F:
-			tech_name = "DrawTonemap";
-			break;
-		case GS_CS_709_SCRGB:
-			tech_name = "DrawMultiply";
-			*multiplier = obs_get_video_sdr_white_level() / 80.0f;
-		default:;
-		}
-		break;
-	case GS_CS_709_SCRGB:
-		switch (current_space) {
-		case GS_CS_SRGB:
-		case GS_CS_SRGB_16F:
-			tech_name = "DrawMultiplyTonemap";
-			*multiplier = 80.0f / obs_get_video_sdr_white_level();
-			break;
-		case GS_CS_709_EXTENDED:
-			tech_name = "DrawMultiply";
-			*multiplier = 80.0f / obs_get_video_sdr_white_level();
-		default:;
-		}
-	}
-
-	return tech_name;
-}
-static void draw_source_draw_frame(draw_source_data_t *context)
-{
-
-	const enum gs_color_space current_space = gs_get_color_space();
-	float multiplier;
-	const char *technique = get_tech_name_and_multiplier(current_space, context->space, &multiplier);
-
-	gs_effect_t *effect = obs_get_base_effect(OBS_EFFECT_DEFAULT);
-	gs_texture_t *tex = gs_texrender_get_texture(context->render);
-	if (!tex)
-		return;
-	const bool previous = gs_framebuffer_srgb_enabled();
-	gs_enable_framebuffer_srgb(true);
-
-	gs_effect_set_texture_srgb(gs_effect_get_param_by_name(effect, "image"), tex);
-	gs_effect_set_float(gs_effect_get_param_by_name(effect, "multiplier"), multiplier);
-
-	while (gs_effect_loop(effect, technique))
-		gs_draw_sprite(tex, 0, context->cx, context->cy);
-
-	gs_enable_framebuffer_srgb(previous);
-}
 void draw_source_video_render(void *data, gs_effect_t *effect)
 {
 	UNUSED_PARAMETER(effect);
 	draw_source_data_t *context = data;
-	if (context->input_type == INPUT_TYPE_SOURCE && !context->source)
+	if (!context->source)
 		return;
 
 	if (context->rendering)
@@ -156,52 +90,6 @@ void draw_source_video_render(void *data, gs_effect_t *effect)
 	obs_source_video_render(source);
 	obs_source_release(source);
 	context->rendering = false;
-	return;
-
-	if (!context->source_cx || !context->source_cy) {
-		obs_source_release(source);
-		context->rendering = false;
-		return;
-	}
-
-	const enum gs_color_space preferred_spaces[] = {
-		GS_CS_SRGB,
-		GS_CS_SRGB_16F,
-		GS_CS_709_EXTENDED,
-	};
-	const enum gs_color_space space =
-		obs_source_get_color_space(source, OBS_COUNTOF(preferred_spaces), preferred_spaces);
-	const enum gs_color_format format = gs_get_format_from_space(space);
-	if (!context->render || gs_texrender_get_format(context->render) != format) {
-		gs_texrender_destroy(context->render);
-		context->render = gs_texrender_create(format, GS_ZS_NONE);
-	} else {
-		gs_texrender_reset(context->render);
-	}
-
-	gs_blend_state_push();
-	gs_blend_function(GS_BLEND_ONE, GS_BLEND_ZERO);
-	if (gs_texrender_begin_with_color_space(context->render, context->cx, context->cy, space)) {
-
-		struct vec4 clear_color;
-
-		vec4_zero(&clear_color);
-		gs_clear(GS_CLEAR_COLOR, &clear_color, 0.0f, 0);
-		if (context->source_cx && context->source_cy) {
-			gs_ortho(0.0f, (float)context->source_cx, 0.0f, (float)context->source_cy, -100.0f, 100.0f);
-			obs_source_video_render(source);
-		}
-		gs_texrender_end(context->render);
-
-		context->space = space;
-	}
-
-	gs_blend_state_pop();
-
-	context->processed_frame = true;
-	obs_source_release(source);
-	context->rendering = false;
-	draw_source_draw_frame(context);
 }
 bool enum_cb(obs_scene_t *scene, obs_sceneitem_t *item, void *param)
 {
@@ -310,10 +198,10 @@ struct obs_source_info draw_source = {.id = "draw_source",
 				      .get_name = draw_source_get_name, //ok
 				      .create = draw_source_create,
 				      .destroy = draw_source_destroy,
-				      .update = draw_source_update,         //ok
-				      .get_width = draw_source_get_width,   //ok
-				      .get_height = draw_source_get_height, //ok
-				      .get_defaults = draw_source_get_defaults,
+				      .update = draw_source_update,             //ok
+				      .get_width = draw_source_get_width,       //ok
+				      .get_height = draw_source_get_height,     //ok
+				      .get_defaults = draw_source_get_defaults, // ok
 				      .video_render = draw_source_video_render,
 				      .get_properties = draw_source_get_properties, //ok
 				      .icon_type = OBS_ICON_TYPE_COLOR};
