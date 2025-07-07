@@ -28,15 +28,11 @@ void draw_source_destroy(void *data)
 {
 	draw_source_data_t *context = data;
 
-	obs_source_t *source = obs_weak_source_get_source(context->clone);
+	obs_source_t *source = obs_weak_source_get_source(context->source);
 	if (source) {
-		if (obs_source_showing(context->source))
-			obs_source_dec_showing(source);
-		if (context->active_clone && obs_source_active(context->source))
-			obs_source_dec_active(source);
 		obs_source_release(source);
 	}
-	obs_weak_source_release(context->clone);
+	obs_weak_source_release(context->source);
 	obs_weak_source_release(context->current_scene);
 	if (context->render) {
 		obs_enter_graphics();
@@ -49,33 +45,25 @@ void draw_source_destroy(void *data)
 uint32_t draw_source_get_height(void *data)
 {
 	draw_source_data_t *context = data;
-	if (!context->clone)
+	if (!context->source)
 		return 1;
-	if (context->buffer_frame > 0)
-		return context->cy;
-	obs_source_t *source = obs_weak_source_get_source(context->clone);
+	obs_source_t *source = obs_weak_source_get_source(context->source);
 	if (!source)
 		return 1;
 	uint32_t height = obs_source_get_height(source);
 	obs_source_release(source);
-	if (context->buffer_frame > 1)
-		height /= context->buffer_frame;
 	return height;
 }
 uint32_t draw_source_get_width(void *data)
 {
 	draw_source_data_t *context = data;
-	if (!context->clone)
+	if (!context->source)
 		return 1;
-	if (context->buffer_frame > 0)
-		return context->cx;
-	obs_source_t *source = obs_weak_source_get_source(context->clone);
+	obs_source_t *source = obs_weak_source_get_source(context->source);
 	if (!source)
 		return 1;
 	uint32_t width = obs_source_get_width(source);
 	obs_source_release(source);
-	if (context->buffer_frame > 1)
-		width /= context->buffer_frame;
 	return width;
 }
 
@@ -153,27 +141,22 @@ void draw_source_video_render(void *data, gs_effect_t *effect)
 {
 	UNUSED_PARAMETER(effect);
 	draw_source_data_t *context = data;
-	if (context->clone_type == CLONE_SOURCE && !context->clone)
+	if (context->input_type == INPUT_TYPE_SOURCE && !context->source)
 		return;
 
-	if (context->buffer_frame > 0 && context->processed_frame) {
-		draw_source_draw_frame(context);
-		return;
-	}
 	if (context->rendering)
 		return;
 	context->rendering = true;
-	obs_source_t *source = obs_weak_source_get_source(context->clone);
+	obs_source_t *source = obs_weak_source_get_source(context->source);
 	if (!source) {
 		context->rendering = false;
 		return;
 	}
-	if (context->buffer_frame == 0) {
-		obs_source_video_render(source);
-		obs_source_release(source);
-		context->rendering = false;
-		return;
-	}
+
+	obs_source_video_render(source);
+	obs_source_release(source);
+	context->rendering = false;
+	return;
 
 	if (!context->source_cx || !context->source_cy) {
 		obs_source_release(source);
@@ -220,9 +203,36 @@ void draw_source_video_render(void *data, gs_effect_t *effect)
 	context->rendering = false;
 	draw_source_draw_frame(context);
 }
-
-bool draw_source_list_add_source(void *data, obs_source_t *source)
+bool enum_cb(obs_scene_t *scene, obs_sceneitem_t *item, void *param)
 {
+	UNUSED_PARAMETER(scene);
+	obs_source_t *source = obs_sceneitem_get_source(item);
+	bool *found = param;
+	const char *source_id = obs_source_get_id(source);
+
+	if (strcmp(source_id, "draw_source") == 0) {
+		*found = true;
+		return false;
+	}
+	return true;
+}
+bool scene_contains_source(obs_source_t *source)
+{
+	if (!source)
+		return false;
+	if (strcmp(obs_source_get_id(source), "scene") != 0)
+		return false;
+
+	bool found = false;
+
+	obs_scene_t *scene_data = obs_scene_from_source(source);
+	obs_scene_enum_items(scene_data, enum_cb, &found);
+	return found;
+}
+bool add_source_to_list(void *data, obs_source_t *source)
+{
+	if (scene_contains_source(source))
+		return true;
 	obs_property_t *prop = data;
 
 	const char *name = obs_source_get_name(source);
@@ -230,265 +240,80 @@ bool draw_source_list_add_source(void *data, obs_source_t *source)
 	size_t idx = 0;
 	while (idx < count && strcmp(name, obs_property_list_item_string(prop, idx)) > 0)
 		idx++;
-	obs_property_list_insert_string(prop, idx, name, name);
-	return true;
-}
-struct same_clones {
-	obs_data_t *settings;
-	DARRAY(const char *) clones;
-};
-bool find_clones(void *data, obs_source_t *source)
-{
-	if (strcmp(obs_source_get_unversioned_id(source), "source-clone") != 0) {
 
-		return true;
-	}
-	obs_data_t *settings = obs_source_get_settings(source);
-	if (!settings)
-		return true;
-	struct same_clones *sc = data;
-	if (settings == sc->settings) {
-		obs_data_release(settings);
-		return true;
-	}
-	if (obs_data_get_int(sc->settings, "clone_type") == CLONE_SOURCE) {
-		if (obs_data_get_int(settings, "clone_type") == CLONE_SOURCE &&
-		    strcmp(obs_data_get_string(sc->settings, "clone"), obs_data_get_string(settings, "clone")) == 0) {
-			const char *name = obs_source_get_name(source);
-			da_push_back(sc->clones, &name);
-		}
-	} else if (obs_data_get_int(sc->settings, "clone_type") == obs_data_get_int(settings, "clone_type")) {
-		const char *name = obs_source_get_name(source);
-		da_push_back(sc->clones, &name);
-	}
-	obs_data_release(settings);
-	return true;
-}
-void find_same_clones(obs_properties_t *props, obs_data_t *settings)
-{
-	struct same_clones sc;
-	sc.settings = settings;
-	da_init(sc.clones);
-	obs_enum_sources(find_clones, &sc);
-	obs_property_t *prop = obs_properties_get(props, "same_clones");
-	if (sc.clones.num) {
-		struct dstr names;
-		dstr_init_copy(&names, sc.clones.array[0]);
-		for (size_t i = 1; i < sc.clones.num; i++) {
-			dstr_cat(&names, "\n");
-			dstr_cat(&names, sc.clones.array[i]);
-		}
-		obs_data_set_string(settings, "same_clones", names.array);
-		dstr_free(&names);
-		obs_property_set_visible(prop, true);
-	} else {
-		obs_data_unset_user_value(settings, "same_clones");
-		obs_property_set_visible(prop, false);
-	}
-	da_free(sc.clones);
-}
-bool draw_source_source_changed(void *priv, obs_properties_t *props, obs_property_t *property, obs_data_t *settings)
-{
-	UNUSED_PARAMETER(property);
-	draw_source_data_t *context = priv;
-	const char *source_name = obs_data_get_string(settings, "clone");
-	bool async = true;
-	obs_source_t *source = obs_get_source_by_name(source_name);
-	if (source == context->source) {
-		obs_source_release(source);
-		source = NULL;
-	}
-	if (source) {
-		async = (obs_source_get_output_flags(source) & OBS_SOURCE_ASYNC) != 0;
-		obs_source_release(source);
-	}
+	uint32_t flags = obs_source_get_output_flags(source);
+	const char *source_id = obs_source_get_id(source);
 
-	obs_property_t *no_filters = obs_properties_get(props, "no_filters");
-	obs_property_set_visible(no_filters, !async);
-
-	find_same_clones(props, settings);
+	if (flags & OBS_SOURCE_VIDEO & (strcmp(source_id, "draw_source") != 0)) {
+		obs_property_list_insert_string(prop, idx, name, name);
+	}
 	return true;
 }
 bool draw_source_type_changed(void *priv, obs_properties_t *props, obs_property_t *property, obs_data_t *settings)
 {
-	UNUSED_PARAMETER(priv);
 	UNUSED_PARAMETER(property);
-	obs_property_t *clone = obs_properties_get(props, "clone");
-	const bool clone_source = obs_data_get_int(settings, "clone_type") == CLONE_SOURCE;
-	obs_property_set_visible(clone, clone_source);
-	if (clone_source) {
-		draw_source_source_changed(priv, props, NULL, settings);
+	UNUSED_PARAMETER(priv);
+	obs_property_t *input_selection = obs_properties_get(props, "input_selection");
+	obs_property_list_clear(input_selection);
+
+	const bool selected_type = obs_data_get_int(settings, "input_type") == INPUT_TYPE_SOURCE;
+	if (selected_type) {
+		obs_enum_sources(add_source_to_list, input_selection);
 	} else {
-		find_same_clones(props, settings);
+		obs_enum_scenes(add_source_to_list, input_selection);
 	}
 	return true;
 }
 obs_properties_t *draw_source_get_properties(void *data)
 {
 	obs_properties_t *props = obs_properties_create();
-	obs_property_t *p = obs_properties_add_list(props, "clone_type", obs_module_text("CloneType"),
+	obs_property_t *p = obs_properties_add_list(props, "input_type", obs_module_text("InputType"),
 						    OBS_COMBO_TYPE_LIST, OBS_COMBO_FORMAT_INT);
-	obs_property_list_add_int(p, obs_module_text("Source"), CLONE_SOURCE);
-	obs_property_list_add_int(p, obs_module_text("CurrentScene"), CLONE_CURRENT_SCENE);
-	obs_property_list_add_int(p, obs_module_text("PreviousScene"), CLONE_PREVIOUS_SCENE);
+	obs_property_list_add_int(p, obs_module_text("Source"), INPUT_TYPE_SOURCE);
+	obs_property_list_add_int(p, obs_module_text("Scene"), INPUT_TYPE_SCENE);
 
 	obs_property_set_modified_callback2(p, draw_source_type_changed, data);
 
-	p = obs_properties_add_list(props, "clone", obs_module_text("Clone"), OBS_COMBO_TYPE_EDITABLE,
+	p = obs_properties_add_list(props, "input_selection", obs_module_text("InputSelection"), OBS_COMBO_TYPE_LIST,
 				    OBS_COMBO_FORMAT_STRING);
-	obs_enum_sources(draw_source_list_add_source, p);
-	obs_enum_scenes(draw_source_list_add_source, p);
+
 	obs_property_list_insert_string(p, 0, "", "");
-	//add global audio sources
-	for (uint32_t i = 1; i < 7; i++) {
-		obs_source_t *s = obs_get_output_source(i);
-		if (!s)
-			continue;
-		draw_source_list_add_source(p, s);
-		obs_source_release(s);
-	}
-	obs_property_set_modified_callback2(p, draw_source_source_changed, data);
-
-	p = obs_properties_add_list(props, "buffer_frame", obs_module_text("VideoBuffer"), OBS_COMBO_TYPE_LIST,
-				    OBS_COMBO_FORMAT_INT);
-	obs_property_list_add_int(p, obs_module_text("None"), 0);
-	obs_property_list_add_int(p, obs_module_text("Full"), 1);
-	obs_property_list_add_int(p, obs_module_text("Half"), 2);
-	obs_property_list_add_int(p, obs_module_text("Third"), 3);
-	obs_property_list_add_int(p, obs_module_text("Quarter"), 4);
-
-	obs_properties_add_bool(props, "active_clone", obs_module_text("ActiveClone"));
-
-	p = obs_properties_add_text(props, "same_clones", obs_module_text("SameClones"), OBS_TEXT_INFO);
-	obs_property_set_visible(p, false);
 
 	return props;
 }
 
-void draw_source_switch_source(draw_source_data_t *context, obs_source_t *source)
+void switch_source(draw_source_data_t *context, obs_source_t *source)
 {
-	obs_source_t *prev_source = obs_weak_source_get_source(context->clone);
+	obs_source_t *prev_source = obs_weak_source_get_source(context->source);
 	if (prev_source) {
-		if (obs_source_showing(context->source))
-			obs_source_dec_showing(prev_source);
-		if (context->active_clone && obs_source_active(context->source))
-			obs_source_dec_active(source);
 		obs_source_release(prev_source);
 	}
-	obs_weak_source_release(context->clone);
-	context->clone = obs_source_get_weak_source(source);
-	if (obs_source_showing(context->source))
-		obs_source_inc_showing(source);
-	if (context->active_clone && obs_source_active(context->source))
-		obs_source_inc_active(source);
+	obs_weak_source_release(context->source);
+	context->source = obs_source_get_weak_source(source);
 }
 void draw_source_update(void *data, obs_data_t *settings)
 {
 	draw_source_data_t *context = data;
-	bool active_clone = obs_data_get_bool(settings, "active_clone");
-	context->clone_type = obs_data_get_int(settings, "clone_type");
-	bool async = true;
-	if (context->clone_type == CLONE_SOURCE) {
-		const char *source_name = obs_data_get_string(settings, "clone");
-		obs_source_t *source = obs_get_source_by_name(source_name);
-		if (source == context->source) {
-			obs_source_release(source);
-			source = NULL;
-		}
-		if (source) {
-			async = (obs_source_get_output_flags(source) & OBS_SOURCE_ASYNC) != 0;
-			if (!obs_weak_source_references_source(context->clone, source) ||
-			    context->active_clone != active_clone) {
-				context->active_clone = active_clone;
-				draw_source_switch_source(context, source);
-			}
-			obs_source_release(source);
-		}
-	}
-	context->active_clone = active_clone;
-	context->buffer_frame = (uint8_t)obs_data_get_int(settings, "buffer_frame");
-}
-void draw_source_save(void *data, obs_data_t *settings)
-{
-	draw_source_data_t *context = data;
-	if (context->clone_type != CLONE_SOURCE) {
-		obs_data_set_string(settings, "clone", "");
-		return;
-	}
-	if (!context->clone)
-		return;
-	obs_source_t *source = obs_weak_source_get_source(context->clone);
-	if (!source)
-		return;
-	obs_data_set_string(settings, "clone", obs_source_get_name(source));
-	obs_source_release(source);
-}
-
-void draw_source_video_tick(void *data, float seconds)
-{
-	UNUSED_PARAMETER(seconds);
-	draw_source_data_t *context = data;
-	context->processed_frame = false;
-
-	if (context->clone_type == CLONE_CURRENT_SCENE) {
-		obs_source_t *source = obs_frontend_get_current_scene();
-		if (!obs_weak_source_references_source(context->clone, source)) {
-			draw_source_switch_source(context, source);
+	context->input_type = obs_data_get_int(settings, "input_type");
+	const char *source_name = obs_data_get_string(settings, "input_selection");
+	obs_source_t *source = obs_get_source_by_name(source_name);
+	if (source) {
+		if (!obs_weak_source_references_source(context->source, source)) {
+			switch_source(context, source);
 		}
 		obs_source_release(source);
-	} else if (context->clone_type == CLONE_PREVIOUS_SCENE) {
-		obs_source_t *current_scene = obs_frontend_get_current_scene();
-		if (!obs_weak_source_references_source(context->current_scene, current_scene)) {
-			obs_source_t *source = obs_weak_source_get_source(context->current_scene);
-			draw_source_switch_source(context, source);
-			obs_source_release(source);
-
-			obs_weak_source_release(context->current_scene);
-			context->current_scene = obs_source_get_weak_source(current_scene);
-		}
-		obs_source_release(current_scene);
-	}
-	if (context->buffer_frame > 0) {
-		uint32_t cx = context->buffer_frame;
-		uint32_t cy = context->buffer_frame;
-		if (context->clone) {
-			obs_source_t *s = obs_weak_source_get_source(context->clone);
-			if (s) {
-				context->source_cx = obs_source_get_width(s);
-				context->source_cy = obs_source_get_height(s);
-
-				cx = context->source_cx;
-				cy = context->source_cy;
-				obs_source_release(s);
-			}
-		}
-		if (context->buffer_frame > 1) {
-			cx /= context->buffer_frame;
-			cy /= context->buffer_frame;
-		}
-		if (cx != context->cx || cy != context->cy) {
-			context->cx = cx;
-			context->cy = cy;
-			obs_enter_graphics();
-			gs_texrender_destroy(context->render);
-			context->render = NULL;
-			obs_leave_graphics();
-		}
 	}
 }
 struct obs_source_info draw_source = {.id = "draw_source",
 				      .type = OBS_SOURCE_TYPE_INPUT,
 				      .output_flags = OBS_SOURCE_VIDEO | OBS_SOURCE_CUSTOM_DRAW,
-				      .get_name = draw_source_get_name,
+				      .get_name = draw_source_get_name, //ok
 				      .create = draw_source_create,
 				      .destroy = draw_source_destroy,
-				      .load = draw_source_update,
-				      .update = draw_source_update,
-				      .save = draw_source_save,
-				      .get_width = draw_source_get_width,
-				      .get_height = draw_source_get_height,
-				      .video_tick = draw_source_video_tick,
+				      .update = draw_source_update,         //ok
+				      .get_width = draw_source_get_width,   //ok
+				      .get_height = draw_source_get_height, //ok
 				      .get_defaults = draw_source_get_defaults,
 				      .video_render = draw_source_video_render,
-				      .get_properties = draw_source_get_properties,
+				      .get_properties = draw_source_get_properties, //ok
 				      .icon_type = OBS_ICON_TYPE_COLOR};
