@@ -2,7 +2,15 @@
 // Created by HichTala on 24/06/25.
 //
 
+#define SHM_NAME "/obs_shared_memory"
+
 #include "draw.h"
+
+#include <errno.h>
+#include <fcntl.h>
+#include <sys/mman.h>
+#include <unistd.h>
+
 
 const char *draw_source_get_name(void *type_data)
 {
@@ -10,10 +18,16 @@ const char *draw_source_get_name(void *type_data)
 	return obs_module_text("Draw Display");
 }
 
+// void init_shared_memory(void *data)
+// {
+// 	draw_source_data_t *context = data;
+//
+// }
 void *draw_source_create(obs_data_t *settings, obs_source_t *source)
 {
 	UNUSED_PARAMETER(settings);
 	draw_source_data_t *context = bzalloc(sizeof(draw_source_data_t));
+	context->shared_frame = NULL;
 	obs_source_update(source, NULL);
 	return context;
 }
@@ -31,6 +45,11 @@ void draw_source_destroy(void *data)
 		obs_enter_graphics();
 		gs_texrender_destroy(context->render);
 		obs_leave_graphics();
+	}
+	if (context->shared_frame) {
+		munmap(context->shared_frame, context->source_width * context->source_height * 4);
+		context->shared_frame = NULL;
+		shm_unlink(SHM_NAME);
 	}
 	bfree(context);
 }
@@ -72,18 +91,62 @@ void draw_source_video_render(void *data, gs_effect_t *effect)
 	if (!context->source)
 		return;
 
-	if (context->rendering)
+	if (context->processing)
 		return;
-	context->rendering = true;
+	context->processing = true;
 	obs_source_t *source = obs_weak_source_get_source(context->source);
 	if (!source) {
-		context->rendering = false;
+		context->processing = false;
 		return;
 	}
 
+	uint32_t width = context->source_width;
+	uint32_t height = context->source_height;
+
+	gs_texrender_t *render = gs_texrender_create(GS_RGBA, GS_ZS_NONE);
+	if (!gs_texrender_begin(render, width, height)) {
+		blog(LOG_ERROR, "Failed to begin texrender: %s", strerror(errno));
+		obs_source_release(source);
+		context->processing = false;
+		return;
+	}
+
+	struct vec4 clear_color;
+	vec4_set(&clear_color, 0.0f, 0.0f, 0.0f, 1.0f); // black
+	gs_clear(GS_CLEAR_COLOR, &clear_color, 0.0f, 0);
+	gs_ortho(0.0f, (float)width, 0.0f, (float)height, -100.0f, 100.0f);
+
 	obs_source_video_render(source);
+	gs_texrender_end(render);
+
+	gs_texture_t *texture = gs_texrender_get_texture(render);
+	if (texture) {
+		gs_stagesurf_t *stage = gs_stagesurface_create(width, height, GS_RGBA);
+		gs_stage_texture(stage, texture);
+		if (stage) {
+			uint8_t *frame = NULL;
+			uint32_t linesize = 0;
+
+			if (gs_stagesurface_map(stage, &frame, &linesize)) {
+				if (context->shared_frame) {
+					for (uint32_t y = 0; y < height; y++) {
+						memcpy(context->shared_frame + y * width * 4,
+						       frame + y * linesize,
+						       width * 4);
+					}
+				}
+				gs_stagesurface_unmap(stage);
+			}
+			gs_stagesurface_destroy(stage);
+
+		} else {
+			blog(LOG_ERROR, "Failed to capture stage surface");
+		}
+	}
+
+	gs_texrender_destroy(render);
 	obs_source_release(source);
-	context->rendering = false;
+	context->processing = false;
 }
 
 bool enum_cb(obs_scene_t *scene, obs_sceneitem_t *item, void *param)
@@ -165,6 +228,22 @@ obs_properties_t *draw_source_get_properties(void *data)
 	return props;
 }
 
+void init_shared_memory(draw_source_data_t *context)
+{
+	if (context->shared_frame) {
+		munmap(context->shared_frame, context->source_width * context->source_height * 4);
+		context->shared_frame = NULL;
+	}
+	const int fd = shm_open(SHM_NAME, O_RDWR | O_CREAT, 0666);
+	if (ftruncate(fd, context->source_width * context->source_height * 4) == -1) {
+		blog(LOG_ERROR, "Failed to truncate shared memory: %s", strerror(errno));
+		close(fd);
+		return;
+	}
+	context->shared_frame = mmap(NULL, context->source_width * context->source_height * 4, PROT_WRITE,
+				     MAP_SHARED, fd, 0);
+	close(fd);
+}
 void switch_source(draw_source_data_t *context, obs_source_t *source)
 {
 	obs_source_t *prev_source = obs_weak_source_get_source(context->source);
@@ -184,20 +263,26 @@ void draw_source_update(void *data, obs_data_t *settings)
 		if (!obs_weak_source_references_source(context->source, source)) {
 			switch_source(context, source);
 		}
+		context->source_width = obs_source_get_width(source);
+		context->source_height = obs_source_get_height(source);
+		init_shared_memory(context);
 		obs_source_release(source);
 	}
 }
 
-struct obs_source_info draw_source = {.id = "draw_source",
-				      .type = OBS_SOURCE_TYPE_INPUT,
-				      .output_flags = OBS_SOURCE_VIDEO | OBS_SOURCE_CUSTOM_DRAW,
-				      .get_name = draw_source_get_name,
-				      .create = draw_source_create,
-				      .destroy = draw_source_destroy,
-				      .update = draw_source_update,
-				      .get_width = draw_source_get_width,
-				      .get_height = draw_source_get_height,
-				      .get_defaults = draw_source_get_defaults,
-				      .video_render = draw_source_video_render,
-				      .get_properties = draw_source_get_properties,
-				      .icon_type = OBS_ICON_TYPE_COLOR};
+struct obs_source_info draw_source =
+{
+	.id = "draw_source",
+	.type = OBS_SOURCE_TYPE_INPUT,
+	.output_flags = OBS_SOURCE_VIDEO | OBS_SOURCE_CUSTOM_DRAW,
+	.get_name = draw_source_get_name,
+	.create = draw_source_create,
+	.destroy = draw_source_destroy,
+	.update = draw_source_update,
+	.get_width = draw_source_get_width,
+	.get_height = draw_source_get_height,
+	.get_defaults = draw_source_get_defaults,
+	.video_render = draw_source_video_render,
+	.get_properties = draw_source_get_properties,
+	.icon_type = OBS_ICON_TYPE_COLOR
+};

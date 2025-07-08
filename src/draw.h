@@ -14,10 +14,15 @@ enum input_type {
 
 struct draw_source_data {
 	enum input_type input_type;
+
 	obs_weak_source_t *source;
+	uint8_t *shared_frame;
+	uint32_t source_width;
+	uint32_t source_height;
+
 
 	gs_texrender_t *render;
-	bool rendering;
+	bool processing;
 };
 typedef struct draw_source_data draw_source_data_t;
 
