@@ -18,11 +18,6 @@ const char *draw_source_get_name(void *type_data)
 	return obs_module_text("Draw Display");
 }
 
-// void init_shared_memory(void *data)
-// {
-// 	draw_source_data_t *context = data;
-//
-// }
 void *draw_source_create(obs_data_t *settings, obs_source_t *source)
 {
 	UNUSED_PARAMETER(settings);
@@ -84,6 +79,11 @@ void draw_source_get_defaults(obs_data_t *settings)
 	UNUSED_PARAMETER(settings);
 }
 
+struct shared_frame_header {
+	uint32_t width;
+	uint32_t height;
+};
+typedef struct shared_frame_header shared_frame_header_t;
 void draw_source_video_render(void *data, gs_effect_t *effect)
 {
 	UNUSED_PARAMETER(effect);
@@ -129,8 +129,13 @@ void draw_source_video_render(void *data, gs_effect_t *effect)
 
 			if (gs_stagesurface_map(stage, &frame, &linesize)) {
 				if (context->shared_frame) {
+					shared_frame_header_t *header = (shared_frame_header_t *)context->shared_frame;
+					header->width = width;
+					header->height = height;
+
+					uint8_t *frame_data = context->shared_frame + sizeof(shared_frame_header_t);
 					for (uint32_t y = 0; y < height; y++) {
-						memcpy(context->shared_frame + y * width * 4,
+						memcpy(frame_data + y * width * 4,
 						       frame + y * linesize,
 						       width * 4);
 					}
@@ -230,17 +235,25 @@ obs_properties_t *draw_source_get_properties(void *data)
 
 void init_shared_memory(draw_source_data_t *context)
 {
+	size_t required_size = sizeof(shared_frame_header_t) + (size_t)context->source_width * context->source_height * 4;
 	if (context->shared_frame) {
-		munmap(context->shared_frame, context->source_width * context->source_height * 4);
+		munmap(context->shared_frame, required_size);
 		context->shared_frame = NULL;
 	}
 	const int fd = shm_open(SHM_NAME, O_RDWR | O_CREAT, 0666);
-	if (ftruncate(fd, context->source_width * context->source_height * 4) == -1) {
+
+	off_t truncate_size = (off_t)required_size;
+	if (truncate_size < 0) {
+		blog(LOG_ERROR, "Truncate size overflow: %zu bytes", required_size);
+		close(fd);
+		return;
+	}
+	if (ftruncate(fd, truncate_size) == -1) {
 		blog(LOG_ERROR, "Failed to truncate shared memory: %s", strerror(errno));
 		close(fd);
 		return;
 	}
-	context->shared_frame = mmap(NULL, context->source_width * context->source_height * 4, PROT_WRITE,
+	context->shared_frame = mmap(NULL, required_size, PROT_WRITE,
 				     MAP_SHARED, fd, 0);
 	close(fd);
 }

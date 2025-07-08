@@ -17,6 +17,7 @@ struct draw_source_data {
 
 	obs_weak_source_t *source;
 	uint8_t *shared_frame;
+	size_t shared_frame_size;
 	uint32_t source_width;
 	uint32_t source_height;
 
