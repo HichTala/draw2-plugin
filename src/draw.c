@@ -2,15 +2,16 @@
 // Created by HichTala on 24/06/25.
 //
 
-#define SHM_NAME "/obs_shared_memory"
+#define OBS_SHM_NAME "/obs_shared_memory"
+#define PYTHON_SHM_NAME "/python_shared_memory"
 
 #include "draw.h"
 
 #include <errno.h>
 #include <fcntl.h>
 #include <sys/mman.h>
+#include <sys/stat.h>
 #include <unistd.h>
-
 
 const char *draw_source_get_name(void *type_data)
 {
@@ -23,6 +24,7 @@ void *draw_source_create(obs_data_t *settings, obs_source_t *source)
 	UNUSED_PARAMETER(settings);
 	draw_source_data_t *context = bzalloc(sizeof(draw_source_data_t));
 	context->shared_frame = NULL;
+	context->display_texture = NULL;
 	obs_source_update(source, NULL);
 	return context;
 }
@@ -44,7 +46,7 @@ void draw_source_destroy(void *data)
 	if (context->shared_frame) {
 		munmap(context->shared_frame, context->source_width * context->source_height * 4);
 		context->shared_frame = NULL;
-		shm_unlink(SHM_NAME);
+		shm_unlink(OBS_SHM_NAME);
 	}
 	bfree(context);
 }
@@ -52,26 +54,16 @@ void draw_source_destroy(void *data)
 uint32_t draw_source_get_height(void *data)
 {
 	draw_source_data_t *context = data;
-	if (!context->source)
+	if (!context->display_height)
 		return 1;
-	obs_source_t *source = obs_weak_source_get_source(context->source);
-	if (!source)
-		return 1;
-	uint32_t height = obs_source_get_height(source);
-	obs_source_release(source);
-	return height;
+	return context->display_height;
 }
 uint32_t draw_source_get_width(void *data)
 {
 	draw_source_data_t *context = data;
-	if (!context->source)
+	if (!context->display_width)
 		return 1;
-	obs_source_t *source = obs_weak_source_get_source(context->source);
-	if (!source)
-		return 1;
-	uint32_t width = obs_source_get_width(source);
-	obs_source_release(source);
-	return width;
+	return context->display_width;
 }
 
 void draw_source_get_defaults(obs_data_t *settings)
@@ -135,9 +127,7 @@ void draw_source_video_render(void *data, gs_effect_t *effect)
 
 					uint8_t *frame_data = context->shared_frame + sizeof(shared_frame_header_t);
 					for (uint32_t y = 0; y < height; y++) {
-						memcpy(frame_data + y * width * 4,
-						       frame + y * linesize,
-						       width * 4);
+						memcpy(frame_data + y * width * 4, frame + y * linesize, width * 4);
 					}
 				}
 				gs_stagesurface_unmap(stage);
@@ -151,6 +141,48 @@ void draw_source_video_render(void *data, gs_effect_t *effect)
 
 	gs_texrender_destroy(render);
 	obs_source_release(source);
+
+	const char *shm_name = PYTHON_SHM_NAME;
+
+	int fd = shm_open(shm_name, O_RDONLY, 0666);
+	if (fd < 0) {
+		context->processing = false;
+		return;
+	}
+
+	struct stat sb;
+	if (fstat(fd, &sb) == -1) {
+		close(fd);
+		context->processing = false;
+		return;
+	}
+
+	uint8_t *python_shared_frame = mmap(NULL, sb.st_size, PROT_READ, MAP_SHARED, fd, 0);
+	close(fd);
+	if (python_shared_frame == MAP_FAILED) {
+		context->processing = false;
+		return;
+	}
+
+	shared_frame_header_t *python_header = (shared_frame_header_t *)python_shared_frame;
+	context->display_width = python_header->width;
+	context->display_height = python_header->height;
+	uint8_t *image_data = python_shared_frame + sizeof(shared_frame_header_t);
+
+	if (context->display_texture)
+		gs_texture_destroy(context->display_texture);
+	context->display_texture =
+		gs_texture_create(context->display_width, context->display_height, GS_RGBA, 1, NULL, GS_DYNAMIC);
+	gs_texture_set_image(context->display_texture, image_data, context->display_width * 4, false);
+
+	munmap(python_shared_frame, sb.st_size);
+
+	gs_effect_t *default_effect = obs_get_base_effect(OBS_EFFECT_DEFAULT);
+	gs_eparam_t *image = gs_effect_get_param_by_name(default_effect, "image");
+	gs_effect_set_texture(image, context->display_texture);
+	while (gs_effect_loop(default_effect, "Draw"))
+		gs_draw_sprite(context->display_texture, 0, context->display_width, context->display_height);
+
 	context->processing = false;
 }
 
@@ -235,12 +267,13 @@ obs_properties_t *draw_source_get_properties(void *data)
 
 void init_shared_memory(draw_source_data_t *context)
 {
-	size_t required_size = sizeof(shared_frame_header_t) + (size_t)context->source_width * context->source_height * 4;
+	size_t required_size =
+		sizeof(shared_frame_header_t) + (size_t)context->source_width * context->source_height * 4;
 	if (context->shared_frame) {
 		munmap(context->shared_frame, required_size);
 		context->shared_frame = NULL;
 	}
-	const int fd = shm_open(SHM_NAME, O_RDWR | O_CREAT, 0666);
+	const int fd = shm_open(OBS_SHM_NAME, O_RDWR | O_CREAT, 0666);
 
 	off_t truncate_size = (off_t)required_size;
 	if (truncate_size < 0) {
@@ -253,8 +286,7 @@ void init_shared_memory(draw_source_data_t *context)
 		close(fd);
 		return;
 	}
-	context->shared_frame = mmap(NULL, required_size, PROT_WRITE,
-				     MAP_SHARED, fd, 0);
+	context->shared_frame = mmap(NULL, required_size, PROT_WRITE, MAP_SHARED, fd, 0);
 	close(fd);
 }
 void switch_source(draw_source_data_t *context, obs_source_t *source)
@@ -283,19 +315,16 @@ void draw_source_update(void *data, obs_data_t *settings)
 	}
 }
 
-struct obs_source_info draw_source =
-{
-	.id = "draw_source",
-	.type = OBS_SOURCE_TYPE_INPUT,
-	.output_flags = OBS_SOURCE_VIDEO | OBS_SOURCE_CUSTOM_DRAW,
-	.get_name = draw_source_get_name,
-	.create = draw_source_create,
-	.destroy = draw_source_destroy,
-	.update = draw_source_update,
-	.get_width = draw_source_get_width,
-	.get_height = draw_source_get_height,
-	.get_defaults = draw_source_get_defaults,
-	.video_render = draw_source_video_render,
-	.get_properties = draw_source_get_properties,
-	.icon_type = OBS_ICON_TYPE_COLOR
-};
+struct obs_source_info draw_source = {.id = "draw_source",
+				      .type = OBS_SOURCE_TYPE_INPUT,
+				      .output_flags = OBS_SOURCE_VIDEO | OBS_SOURCE_CUSTOM_DRAW,
+				      .get_name = draw_source_get_name,
+				      .create = draw_source_create,
+				      .destroy = draw_source_destroy,
+				      .update = draw_source_update,
+				      .get_width = draw_source_get_width,
+				      .get_height = draw_source_get_height,
+				      .get_defaults = draw_source_get_defaults,
+				      .video_render = draw_source_video_render,
+				      .get_properties = draw_source_get_properties,
+				      .icon_type = OBS_ICON_TYPE_COLOR};
