@@ -2,11 +2,7 @@
 // Created by HichTala on 24/06/25.
 //
 
-#include <obs-frontend-api.h>
 #include "draw.h"
-
-#include "plugin-support.h"
-#include "util/dstr.h"
 
 const char *draw_source_get_name(void *type_data)
 {
@@ -18,8 +14,6 @@ void *draw_source_create(obs_data_t *settings, obs_source_t *source)
 {
 	UNUSED_PARAMETER(settings);
 	draw_source_data_t *context = bzalloc(sizeof(draw_source_data_t));
-	context->cx = 1;
-	context->cy = 1;
 	obs_source_update(source, NULL);
 	return context;
 }
@@ -33,7 +27,6 @@ void draw_source_destroy(void *data)
 		obs_source_release(source);
 	}
 	obs_weak_source_release(context->source);
-	obs_weak_source_release(context->current_scene);
 	if (context->render) {
 		obs_enter_graphics();
 		gs_texrender_destroy(context->render);
@@ -71,6 +64,7 @@ void draw_source_get_defaults(obs_data_t *settings)
 {
 	UNUSED_PARAMETER(settings);
 }
+
 void draw_source_video_render(void *data, gs_effect_t *effect)
 {
 	UNUSED_PARAMETER(effect);
@@ -91,6 +85,7 @@ void draw_source_video_render(void *data, gs_effect_t *effect)
 	obs_source_release(source);
 	context->rendering = false;
 }
+
 bool enum_cb(obs_scene_t *scene, obs_sceneitem_t *item, void *param)
 {
 	UNUSED_PARAMETER(scene);
@@ -192,16 +187,17 @@ void draw_source_update(void *data, obs_data_t *settings)
 		obs_source_release(source);
 	}
 }
+
 struct obs_source_info draw_source = {.id = "draw_source",
 				      .type = OBS_SOURCE_TYPE_INPUT,
 				      .output_flags = OBS_SOURCE_VIDEO | OBS_SOURCE_CUSTOM_DRAW,
-				      .get_name = draw_source_get_name, //ok
+				      .get_name = draw_source_get_name,
 				      .create = draw_source_create,
 				      .destroy = draw_source_destroy,
-				      .update = draw_source_update,             //ok
-				      .get_width = draw_source_get_width,       //ok
-				      .get_height = draw_source_get_height,     //ok
-				      .get_defaults = draw_source_get_defaults, // ok
+				      .update = draw_source_update,
+				      .get_width = draw_source_get_width,
+				      .get_height = draw_source_get_height,
+				      .get_defaults = draw_source_get_defaults,
 				      .video_render = draw_source_video_render,
-				      .get_properties = draw_source_get_properties, //ok
+				      .get_properties = draw_source_get_properties,
 				      .icon_type = OBS_ICON_TYPE_COLOR};
