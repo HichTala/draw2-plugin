@@ -55,14 +55,14 @@ uint32_t draw_source_get_height(void *data)
 {
 	draw_source_data_t *context = data;
 	if (!context->display_height)
-		return 1;
+		return 391;
 	return context->display_height;
 }
 uint32_t draw_source_get_width(void *data)
 {
 	draw_source_data_t *context = data;
 	if (!context->display_width)
-		return 1;
+		return 268;
 	return context->display_width;
 }
 
