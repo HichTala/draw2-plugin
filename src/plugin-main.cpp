@@ -16,10 +16,11 @@ You should have received a copy of the GNU General Public License along
 with this program. If not, see <https://www.gnu.org/licenses/>
 */
 
+#include <QWidget>
+#include <obs-frontend-api.h>
 #include <obs-module.h>
 #include <plugin-support.h>
-#include <obs-frontend-api.h>
-#include <QWidget>
+
 #include "DrawDock.hpp"
 
 extern "C" {

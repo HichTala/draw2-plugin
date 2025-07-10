@@ -13,6 +13,7 @@
 #include <QApplication>
 #include <QIcon>
 #include <QStyle>
+#include <thread>
 
 class DrawDock : public QWidget {
 	Q_OBJECT
@@ -25,10 +26,16 @@ private:
 	QWidget *parent = nullptr;
 	QPushButton *start_button = new QPushButton();
 	QPushButton *settings_button = new QPushButton();
+	std::thread python_thread;
+	std::atomic<bool> should_run = false;
+	std::atomic<bool> running_flag = false;
 
 private slots:
-	void StartButtonClicked() const;
+	void StartButtonClicked();
 	void SettingsButtonClicked();
+	void StartPythonDraw();
+	void StopPythonDraw();
+
 };
 
 #endif //DRAW_DOCK_H
