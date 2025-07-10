@@ -53,14 +53,16 @@ DrawDock::DrawDock(QWidget *parent) : QWidget(parent)
 }
 DrawDock::~DrawDock()
 {
-	if (this->should_run) StopPythonDraw();
+	if (this->should_run)
+		StopPythonDraw();
 };
 
 void DrawDock::StartButtonClicked()
 {
 	if (this->start_button->isChecked()) {
+		this->start_button->setDisabled(true);
+		this->start_button->setText("Starting Draw...");
 		StartPythonDraw();
-		this->start_button->setText("Stop Draw");
 	} else {
 		StopPythonDraw();
 		this->start_button->setText("Start Draw");
@@ -79,6 +81,7 @@ void DrawDock::StartPythonDraw()
 		return;
 	this->running_flag.store(true);
 	this->should_run.store(true);
+	this->model_ready.store(false);
 
 	this->python_thread = std::thread([this]() {
 		PyGILState_STATE gstate = PyGILState_Ensure();
@@ -91,22 +94,27 @@ void DrawDock::StartPythonDraw()
 		if (pModule) {
 			PyObject *pFunc = PyObject_GetAttrString(pModule, "run");
 			if (pFunc && PyCallable_Check(pFunc)) {
-				PyObject *args = PyTuple_New(5);
-				PyObject *capsule = PyCapsule_New(&this->should_run, "stop_flag", nullptr);
-				PyTuple_SetItem(args, 0, capsule);
+				PyObject *args = PyTuple_New(6);
+				PyObject *capsule_stop = PyCapsule_New(&this->should_run, "stop_flag", nullptr);
+				PyTuple_SetItem(args, 0, capsule_stop);
+
+				PyObject *capsule_ready = PyCapsule_New(&this->model_ready, "model_ready", nullptr);
+				PyTuple_SetItem(args, 1, capsule_ready);
+
 				QSettings settings = QSettings("HichTala", "Draw2");
 
-				char *deck_list_path = settings.value("deck_list", "").value<QString>().toUtf8().data();
-				PyTuple_SetItem(args, 1, PyUnicode_FromString(deck_list_path));
+				QByteArray deck_list_path = settings.value("deck_list", "").toString().toUtf8();
+				PyTuple_SetItem(args, 2, PyUnicode_FromString(deck_list_path.constData()));
 
-				int minimum_out_of_screen_time_value = settings.value("minimum_out_of_screen_time", 25).value<int>();
-				PyTuple_SetItem(args, 2, PyLong_FromLong(minimum_out_of_screen_time_value));
+				int minimum_out_of_screen_time_value =
+					settings.value("minimum_out_of_screen_time", 25).value<int>();
+				PyTuple_SetItem(args, 3, PyLong_FromLong(minimum_out_of_screen_time_value));
 
 				int minimum_screen_time_value = settings.value("minimum_screen_time", 6).value<int>();
-				PyTuple_SetItem(args, 3, PyLong_FromLong(minimum_screen_time_value));
+				PyTuple_SetItem(args, 4, PyLong_FromLong(minimum_screen_time_value));
 
 				int confidence_value = settings.value("confidence_slider", 1).value<int>();
-				PyTuple_SetItem(args, 4, PyLong_FromLong(confidence_value));
+				PyTuple_SetItem(args, 5, PyLong_FromLong(confidence_value));
 
 				PyObject_CallObject(pFunc, args);
 				Py_DECREF(args);
@@ -122,6 +130,16 @@ void DrawDock::StartPythonDraw()
 		PyGILState_Release(gstate);
 		this->running_flag.store(false);
 	});
+	std::thread([this]() {
+		for (int i = 0; i < 300; ++i) {
+			if (this->model_ready.load()) {
+				this->start_button->setEnabled(true);
+				this->start_button->setText("Stop Draw");
+				break;
+			}
+			std::this_thread::sleep_for(std::chrono::milliseconds(1000));
+		}
+	}).detach();
 }
 
 void DrawDock::StopPythonDraw()

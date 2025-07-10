@@ -28,6 +28,7 @@ private:
 	QPushButton *settings_button = new QPushButton();
 	std::thread python_thread;
 	std::atomic<bool> should_run = false;
+	std::atomic<bool> model_ready = false;
 	std::atomic<bool> running_flag = false;
 
 private slots:
