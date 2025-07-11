@@ -10,17 +10,31 @@
 #include "plugin-support.h"
 
 #include <QSettings>
+#include <QStandardPaths>
 #include <util/base.h>
 
 void initialize_python_interpreter()
 {
+	obs_log(LOG_INFO, "Initializing Python interpreter ");
 	if (!Py_IsInitialized()) {
+
+		QSettings settings = QSettings("HichTala", "Draw2");
+		QByteArray pyHome = settings.value("python_path", "").toString().toUtf8();
+		QString sitePackagesPath = pyHome + "/lib/python3.12/site-packages";
+
+		obs_log(LOG_INFO, "Initializing Python interpreter with home: %s", pyHome.toStdString().c_str());
+		obs_log(LOG_INFO, "Initializing Python interpreter with site packages: %s", sitePackagesPath.toStdString().c_str());
+
+		qputenv("PYTHONHOME", QByteArray(pyHome));
+		qputenv("PYTHONPATH", QByteArray(sitePackagesPath.toUtf8()));
+
+
 		Py_Initialize();
+		// PyRun_SimpleString(R"(import sys)");
+		// PyRun_SimpleString(R"(sys.path.insert(0, '/home/hicham/miniconda3/envs/phd/lib/python3.12/site-packages'))");
+		// PyRun_SimpleString(R"(sys.path.insert(0, '/home/hicham/miniconda3/envs/phd/lib/python3.12/site-packages'))");
+
 	}
-	PyRun_SimpleString(R"(
-import sys
-sys.path.insert(0, '/home/hicham/miniconda3/envs/phd/lib/python3.12/site-packages')
-)");
 }
 
 DrawDock::DrawDock(QWidget *parent) : QWidget(parent)
@@ -63,10 +77,12 @@ void DrawDock::StartButtonClicked()
 	if (this->start_button->isChecked()) {
 		this->start_button->setDisabled(true);
 		this->start_button->setText("Starting Draw...");
+		this->settings_button->setDisabled(true);
 		StartPythonDraw();
 	} else {
 		StopPythonDraw();
 		this->start_button->setText("Start Draw");
+		this->settings_button->setEnabled(true);
 	}
 }
 
@@ -140,6 +156,10 @@ void DrawDock::StartPythonDraw()
 				break;
 			}
 			std::this_thread::sleep_for(std::chrono::milliseconds(1000));
+		}
+		if (!this->start_button->isEnabled()) {
+			this->start_button->setDisabled(true);
+			this->start_button->setText("Start Draw");
 		}
 	}).detach();
 }

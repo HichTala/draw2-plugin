@@ -39,4 +39,6 @@ private slots:
 
 };
 
+void initialize_python_interpreter();
+
 #endif //DRAW_DOCK_H

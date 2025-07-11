@@ -20,10 +20,12 @@ public:
 	explicit SettingsDialog(QWidget *parent = nullptr);
 
 private:
+	QLineEdit *python_path = new QLineEdit();
 	QLineEdit *deck_list = new QLineEdit();
 	QSpinBox *minimum_out_of_screen_time = new QSpinBox;
 	QSpinBox *minimum_screen_time = new QSpinBox;
 	QSlider *confidence_slider = new QSlider(Qt::Horizontal);
+	QPushButton *python_browse_button = new QPushButton("Browse");
 	QPushButton *browse_button = new QPushButton("Browse");
 	QPushButton *ok_button = new QPushButton("&OK");
 	QPushButton *cancel_button = new QPushButton("&Cancel");
@@ -34,6 +36,7 @@ private:
 	// int confidence_value;
 
 private slots:
+	void PythonBrowseButtonClicked();
 	void BrowseButtonClicked();
 	void OkButtonClicked();
 	void CancelButtonClicked();
