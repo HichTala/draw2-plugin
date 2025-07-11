@@ -81,8 +81,7 @@ SettingsDialog::SettingsDialog(QWidget *parent) : QDialog(parent)
 void SettingsDialog::PythonBrowseButtonClicked()
 {
 	QString folderPath =
-		QFileDialog::getExistingDirectory(this, "Select Python Installation Folder",
-						  QString(),
+		QFileDialog::getExistingDirectory(this, "Select Python Installation Folder", QString(),
 						  QFileDialog::ShowDirsOnly | QFileDialog::DontResolveSymlinks);
 	if (!folderPath.isEmpty()) {
 		this->python_path->setText(folderPath);
