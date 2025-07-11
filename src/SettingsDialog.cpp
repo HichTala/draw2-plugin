@@ -7,8 +7,6 @@
 
 #include "SettingsDialog.hpp"
 
-#include <util/base.h>
-
 SettingsDialog::SettingsDialog(QWidget *parent) : QDialog(parent)
 {
 	setWindowTitle("Draw 2 Settings");
