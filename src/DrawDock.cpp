@@ -7,7 +7,7 @@
 #include "DrawDock.hpp"
 
 #include "SettingsDialog.hpp"
-#include "plugin-support.h"
+// #include "plugin-support.h"
 
 #include <QSettings>
 #include <QStandardPaths>
@@ -15,15 +15,15 @@
 
 void initialize_python_interpreter()
 {
-	obs_log(LOG_INFO, "Initializing Python interpreter ");
+	blog(LOG_INFO, "Initializing Python interpreter ");
 	if (!Py_IsInitialized()) {
 
 		QSettings settings = QSettings("HichTala", "Draw2");
 		QByteArray pyHome = settings.value("python_path", "").toString().toUtf8();
 		QString sitePackagesPath = pyHome + "/lib/python3.12/site-packages";
 
-		obs_log(LOG_INFO, "Initializing Python interpreter with home: %s", pyHome.toStdString().c_str());
-		obs_log(LOG_INFO, "Initializing Python interpreter with site packages: %s",
+		blog(LOG_INFO, "Initializing Python interpreter with home: %s", pyHome.toStdString().c_str());
+		blog(LOG_INFO, "Initializing Python interpreter with site packages: %s",
 			sitePackagesPath.toStdString().c_str());
 
 		qputenv("PYTHONHOME", QByteArray(pyHome));
@@ -151,7 +151,7 @@ void DrawDock::StartPythonDraw()
 			if (this->model_ready.load()) {
 				this->start_button->setEnabled(true);
 				this->start_button->setText("Stop Draw");
-				obs_log(LOG_INFO, "Draw2 python backend started successfully");
+				blog(LOG_INFO, "Draw2 python backend started successfully");
 				break;
 			}
 			std::this_thread::sleep_for(std::chrono::milliseconds(1000));
@@ -165,7 +165,7 @@ void DrawDock::StartPythonDraw()
 
 void DrawDock::StopPythonDraw()
 {
-	obs_log(LOG_INFO, "Stopping Draw2 python backend");
+	blog(LOG_INFO, "Stopping Draw2 python backend");
 	if (!this->running_flag.load())
 		return;
 	this->should_run.store(false);
