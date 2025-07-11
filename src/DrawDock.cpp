@@ -100,7 +100,7 @@ void DrawDock::StartPythonDraw()
 
 	this->python_thread = std::thread([this]() {
 		PyGILState_STATE gstate = PyGILState_Ensure();
-		obs_log(LOG_INFO, "Starting Draw2 python backend");
+		blog(LOG_INFO, "Starting Draw2 python backend");
 
 		PyObject *pName = PyUnicode_FromString("draw");
 		PyObject *pModule = PyImport_ImportModule("draw");
