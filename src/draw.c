@@ -155,7 +155,7 @@ void draw_source_video_render(void *data, gs_effect_t *effect)
 	obs_source_release(source);
 
 #ifdef _WIN32
-	HANDLE python_shared_frame_handle = OpenFileMappingA(FILE_MAP_READ, FALSE, PYTHON_SHM_NAME);
+	HANDLE python_shared_frame_handle = OpenFileMapping(FILE_MAP_READ, FALSE, PYTHON_SHM_NAME);
 	if (!python_shared_frame_handle) {
 		context->processing = false;
 		return;
