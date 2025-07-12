@@ -2,8 +2,13 @@
 // Created by HichTala on 24/06/25.
 //
 
+#ifdef _WIN32
+#define OBS_SHM_NAME L"Local\\obs_shared_memory"
+#define PYTHON_SHM_NAME L"Local\\python_shared_memory"
+#else
 #define OBS_SHM_NAME "/obs_shared_memory"
 #define PYTHON_SHM_NAME "/python_shared_memory"
+#endif
 
 #include "draw.h"
 
