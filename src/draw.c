@@ -164,6 +164,7 @@ void draw_source_video_render(void *data, gs_effect_t *effect)
 		return;
 	}
 	shared_frame_header_t *python_header = (shared_frame_header_t *)pBuf;
+	uint8_t *python_shared_frame = (uint8_t *)pBuf;
 #else
 	int fd = shm_open(shm_name, O_RDONLY, 0666);
 	if (fd < 0) {
