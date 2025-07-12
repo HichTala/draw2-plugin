@@ -154,10 +154,8 @@ void draw_source_video_render(void *data, gs_effect_t *effect)
 	gs_texrender_destroy(render);
 	obs_source_release(source);
 
-	const char *shm_name = PYTHON_SHM_NAME;
-
 #ifdef _WIN32
-	HANDLE python_shared_frame_handle = OpenFileMappingA(FILE_MAP_READ, FALSE, shm_name);
+	HANDLE python_shared_frame_handle = OpenFileMappingA(FILE_MAP_READ, FALSE, PYTHON_SHM_NAME);
 	if (!python_shared_frame_handle) {
 		context->processing = false;
 		return;
@@ -171,7 +169,7 @@ void draw_source_video_render(void *data, gs_effect_t *effect)
 	shared_frame_header_t *python_header = (shared_frame_header_t *)pBuf;
 	uint8_t *python_shared_frame = (uint8_t *)pBuf;
 #else
-	int fd = shm_open(shm_name, O_RDONLY, 0666);
+	int fd = shm_open(PYTHON_SHM_NAME, O_RDONLY, 0666);
 	if (fd < 0) {
 		context->processing = false;
 		return;
