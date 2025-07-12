@@ -110,6 +110,14 @@ package() {
       return 2
     }
 
+    log_group "Xcode and SDK Info"
+    export SDKROOT="$(xcrun --sdk macosx --show-sdk-path)"
+    export DEVELOPER_DIR="/Applications/Xcode_16.1.0.app/Contents/Developer"
+    xcodebuild -version
+    xcodebuild -showsdks
+    xcode-select -p
+    xcrun --show-sdk-version
+
     log_group "Packaging ${product_name}..."
     pushd ${project_root}
 
