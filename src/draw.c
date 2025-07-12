@@ -23,7 +23,7 @@ void *draw_source_create(obs_data_t *settings, obs_source_t *source)
 	context->display_texture = NULL;
 	obs_source_update(source, NULL);
 #ifdef _WIN32
-	context->shared_frame_handle=NULL;
+	context->shared_frame_handle = NULL;
 #endif
 	return context;
 }
