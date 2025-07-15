@@ -83,6 +83,15 @@ jobs:
         with:
           submodules: recursive
           fetch-depth: 0
+      - name: Install Python 3.13
+        run: |
+          brew install python@3.13
+
+      - name: Set Python Environment Variables
+        run: |
+          echo "PYTHON_LIBRARY=$(brew --prefix python@3.13)/Frameworks/Python.framework/Versions/3.13/lib/libpython3.13.dylib" >> $GITHUB_ENV
+          echo "PYTHON_INCLUDE_DIR=$(brew --prefix python@3.13)/Frameworks/Python.framework/Versions/3.13/include/python3.13" >> $GITHUB_ENV
+          echo "CMAKE_OSX_ARCHITECTURES=x86_64" >> $GITHUB_ENV
 
       - name: Set Up Environment 🔧
         id: setup
@@ -179,7 +188,7 @@ jobs:
     name: Build for Ubuntu 🐧
     strategy:
       matrix:
-        os: [ubuntu-24.04]
+        os: [ ubuntu-24.04 ]
     runs-on: ${{ matrix.os }}
     needs: check-event
     defaults:
