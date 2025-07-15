@@ -25,11 +25,6 @@ add_library(
 find_package(libobs REQUIRED)
 target_link_libraries(${CMAKE_PROJECT_NAME} PRIVATE OBS::libobs)
 
-# Add before you find Python or set architecture
-set(PYTHON_LIBRARY $ENV{PYTHON_LIBRARY} CACHE FILEPATH "Path to Python library")
-set(PYTHON_INCLUDE_DIR $ENV{PYTHON_INCLUDE_DIR} CACHE PATH "Path to Python include dir")
-set(CMAKE_OSX_ARCHITECTURES $ENV{CMAKE_OSX_ARCHITECTURES} CACHE STRING "Target architecture")
-
 find_package(Python3 REQUIRED COMPONENTS Interpreter Development)
 target_include_directories(${CMAKE_PROJECT_NAME} PRIVATE ${Python3_INCLUDE_DIRS})
 target_link_libraries(${CMAKE_PROJECT_NAME} PRIVATE ${Python3_LIBRARIES})
