@@ -23,16 +23,6 @@ jobs:
       - uses: actions/checkout@v4
         with:
           fetch-depth: 0
-      # PATCH: Install Python for x86_64 and set env vars
-      - name: Install Python x86_64 under Rosetta
-        run: |
-          arch -x86_64 /usr/local/bin/brew install python@3.13
-
-      - name: Set Python x86_64 Environment Variables
-        run: |
-          echo "PYTHON_LIBRARY=/usr/local/opt/python@3.13/Frameworks/Python.framework/Versions/3.13/lib/libpython3.13.dylib" >> $GITHUB_ENV
-          echo "PYTHON_INCLUDE_DIR=/usr/local/opt/python@3.13/Frameworks/Python.framework/Versions/3.13/include/python3.13" >> $GITHUB_ENV
-          echo "CMAKE_OSX_ARCHITECTURES=x86_64" >> $GITHUB_ENV
       - name: Check Event Data ☑️
         id: setup
         env:

@@ -88,17 +88,6 @@ build() {
 
   check_macos
 
-  # Force install x86_64 Python (Homebrew's python@3.12 is safest)
-  brew install python@3.12
-
-  # Get proper Python paths
-  PYTHON_PREFIX=$(brew --prefix python@3.12)
-  PYTHON_EXEC="${PYTHON_PREFIX}/bin/python3"
-  PYTHON_LIB="${PYTHON_PREFIX}/Frameworks/Python.framework/Versions/3.12/Python"
-
-  # Export CMake variables to ensure Python detection and arch match
-  export CMAKE_ARGS="-DCMAKE_OSX_ARCHITECTURES=x86_64 -DPYTHON_EXECUTABLE=${PYTHON_EXEC} -DPYTHON_LIBRARY=${PYTHON_LIB}"
-
   local product_name
   local product_version
   read -r product_name product_version <<< \
@@ -122,7 +111,7 @@ build() {
   }
 
   log_group "Configuring ${product_name}..."
-  cmake -S ${project_root} ${cmake_args} -DCMAKE_OSX_ARCHITECTURES=x86_64 -DPYTHON_EXECUTABLE=${PYTHON_EXEC} -DPYTHON_LIBRARY=${PYTHON_LIB}
+  cmake -S ${project_root} ${cmake_args}
 
   log_group "Building ${product_name}..."
   run_xcodebuild() {
