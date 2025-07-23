@@ -146,8 +146,8 @@ jobs:
           BOOST_ROOT=$(brew --prefix boost)
           echo "BOOST_ROOT=$BOOST_ROOT" >> $GITHUB_ENV
           echo "CMAKE_PREFIX_PATH=$BOOST_ROOT" >> $GITHUB_ENV
-      - name: Debug Boost Install
-        run: ls -l $(brew --prefix boost)/include/boost
+      - name: Print env
+        run: env | grep -E 'BOOST_ROOT|CMAKE_PREFIX_PATH'
 
       - uses: actions/cache/restore@v4
         id: ccache-cache
