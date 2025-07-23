@@ -64,7 +64,7 @@ DrawDock::DrawDock(QWidget *parent) : QWidget(parent)
 
 	// initialize_python_interpreter();
 }
-DrawDock::~DrawDock(){
+DrawDock::~DrawDock() {
 	// if (this->should_run)
 	// 	StopPythonDraw();
 };
