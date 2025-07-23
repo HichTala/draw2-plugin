@@ -112,6 +112,8 @@ jobs:
           print "pluginName=${product_name}" >> $GITHUB_OUTPUT
           print "pluginVersion=${product_version}" >> $GITHUB_OUTPUT
 
+      - name: Print env
+        run: env | grep -E 'BOOST_ROOT|CMAKE_PREFIX_PATH'
       - name: Install Boost 🚀
         run: brew install boost
       - name: Check Boost location
@@ -121,15 +123,11 @@ jobs:
           BOOST_ROOT=$(brew --prefix boost)
           echo "BOOST_ROOT=$BOOST_ROOT" >> $GITHUB_ENV
           echo "CMAKE_PREFIX_PATH=$BOOST_ROOT" >> $GITHUB_ENV
-      - name: Debug Boost Install
-        run: ls -l $(brew --prefix boost)/include/boost
       - name: Set BOOST_ROOT and CMAKE_PREFIX_PATH
         run: |
           BOOST_ROOT=$(brew --prefix boost)
           echo "BOOST_ROOT=$BOOST_ROOT" >> $GITHUB_ENV
           echo "CMAKE_PREFIX_PATH=$BOOST_ROOT" >> $GITHUB_ENV
-      - name: Print env
-        run: env | grep -E 'BOOST_ROOT|CMAKE_PREFIX_PATH'
 
       - uses: actions/cache/restore@v4
         id: ccache-cache
