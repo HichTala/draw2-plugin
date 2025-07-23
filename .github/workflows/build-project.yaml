@@ -84,24 +84,6 @@ jobs:
           submodules: recursive
           fetch-depth: 0
 
-      - name: Show runner architecture and brew location
-        run: |
-          uname -a
-          arch
-          which brew
-          brew config
-
-      - name: Download x86_64 Python 3.13 installer
-        run: |
-          curl -LO https://www.python.org/ftp/python/3.13.0/python-3.13.0-macos11.pkg
-          sudo installer -pkg python-3.13.0-macos11.pkg -target /
-
-      - name: Set Python Environment Variables for x86_64
-        run: |
-          echo "PYTHON_LIBRARY=/Library/Frameworks/Python.framework/Versions/3.13/lib/libpython3.13.dylib" >> $GITHUB_ENV
-          echo "PYTHON_INCLUDE_DIR=/Library/Frameworks/Python.framework/Versions/3.13/include/python3.13" >> $GITHUB_ENV
-          echo "CMAKE_OSX_ARCHITECTURES=x86_64" >> $GITHUB_ENV
-
       - name: Set Up Environment 🔧
         id: setup
         run: |
