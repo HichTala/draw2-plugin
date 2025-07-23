@@ -27,6 +27,8 @@ add_library(
 find_package(libobs REQUIRED)
 target_link_libraries(${CMAKE_PROJECT_NAME} PRIVATE OBS::libobs)
 
+set(BOOST_ROOT $ENV{BOOST_ROOT})
+set(CMAKE_PREFIX_PATH $ENV{CMAKE_PREFIX_PATH})
 find_package(Boost REQUIRED)
 
 if(ENABLE_FRONTEND_API)
