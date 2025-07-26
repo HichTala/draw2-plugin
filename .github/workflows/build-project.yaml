@@ -270,7 +270,7 @@ jobs:
 
       - name: Download Boost
         run: |
-          $boostVersion = "1.83.0"
+          $boostVersion = "1.88.0"
           $boostZip = "boost_${boostVersion.Replace('.', '_')}.zip"
           $boostUrl = "https://boostorg.jfrog.io/artifactory/main/release/$boostVersion/source/$boostZip"
           Invoke-WebRequest -Uri $boostUrl -OutFile $boostZip
