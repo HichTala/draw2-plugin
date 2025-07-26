@@ -268,6 +268,12 @@ jobs:
           submodules: recursive
           fetch-depth: 0
 
+      - name: Install Boost
+        uses: MarkusJx/install-boost@v2
+        id: install-boost
+        with:
+          boost_version: 1.89.0
+
       - name: Set Up Environment 🔧
         id: setup
         run: |
