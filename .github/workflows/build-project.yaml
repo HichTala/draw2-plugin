@@ -272,7 +272,7 @@ jobs:
         uses: MarkusJx/install-boost@v2
         id: install-boost
         with:
-          boost_version: 1.89.0
+          boost_version: 1.88.0
 
       - name: Set Up Environment 🔧
         id: setup
