@@ -276,12 +276,21 @@ jobs:
           $boostUrl = "https://boostorg.jfrog.io/artifactory/main/release/$boostVersion/source/$boostZip"
           Write-Host "Downloading Boost from $boostUrl"
           Invoke-WebRequest -Uri $boostUrl -OutFile $boostZip
+          if (-not (Test-Path $boostZip)) {
+            Write-Error "Boost zip file was not downloaded."
+            exit 1
+          }
+          $zipInfo = Get-Item $boostZip
+          if ($zipInfo.Length -lt 100000) {
+            Write-Error "Downloaded zip file is unexpectedly small. Possible network or server issue."
+            exit 1
+          }
           $extractPath = "$env:USERPROFILE\boost"
           if (!(Test-Path $extractPath)) {
             New-Item -ItemType Directory -Path $extractPath | Out-Null
           }
-          Write-Host "Extracting $boostZip to $extractPath"
-          Expand-Archive -Path $boostZip -DestinationPath $extractPath
+          Write-Host "Extracting $boostZip to $extractPath using 7z"
+          & 7z x $boostZip "-o$extractPath" | Write-Host
           $boostRoot = "$extractPath\boost_$($boostVersion.Replace('.', '_'))"
           echo "BOOST_ROOT=$boostRoot" >> $env:GITHUB_ENV
           Write-Host "BOOST_ROOT set to $boostRoot"
