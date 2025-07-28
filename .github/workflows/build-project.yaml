@@ -284,7 +284,7 @@ jobs:
           "pluginVersion=${ProductVersion}" >> $env:GITHUB_OUTPUT
 
       - name: Install Boost 🚀
-        run: vcpkg install boost
+        run: vcpkg install boost-interprocess
 
       - name: Build Plugin 🧱
         uses: ./.github/actions/build-plugin
