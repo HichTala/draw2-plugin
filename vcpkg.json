@@ -1,0 +1,7 @@
+{
+  "name": "draw2-obsplugin",
+  "version-string": "0.1.0",
+  "dependencies": [
+    "boost-interprocess"
+  ]
+}

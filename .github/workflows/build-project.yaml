@@ -287,9 +287,8 @@ jobs:
         uses: lukka/run-vcpkg@v11
         with:
           vcpkgDirectory: '${{ github.workspace }}/vcpkg'
-          vcpkgJsonGlob: ''  # We're not using a vcpkg.json
+          vcpkgJsonGlob: 'vcpkg.json'
           runVcpkgInstall: true
-          vcpkgArguments: boost-interprocess
 
       - name: Build Plugin 🧱
         uses: ./.github/actions/build-plugin
