@@ -7,15 +7,6 @@
 
 #include <obs-module.h>
 
-#ifdef _WIN32
-#include <windows.h>
-#else
-#include <sys/mman.h>
-#include <fcntl.h>
-#include <sys/stat.h>
-#include <unistd.h>
-#endif
-
 enum input_type { INPUT_TYPE_SOURCE, INPUT_TYPE_SCENE };
 
 struct draw_source_data {
@@ -23,11 +14,8 @@ struct draw_source_data {
 
 	obs_weak_source_t *source;
 
-#ifdef _WIN32
-	HANDLE shared_frame_handle;
-#endif
-
-	uint8_t *shared_frame;
+	void* region;
+	void *shared_frame;
 	size_t shared_frame_size;
 	uint32_t source_width;
 	uint32_t source_height;
