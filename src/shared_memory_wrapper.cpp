@@ -81,7 +81,6 @@ extern "C" bool read_shared_memory(draw_source_data_t *context)
 							     1, nullptr, GS_DYNAMIC);
 		gs_texture_set_image(context->display_texture, image_data, context->display_width * 4, false);
 
-
 	} catch (const interprocess_exception &ex) {
 		context->processing = false;
 		return false;
@@ -90,11 +89,12 @@ extern "C" bool read_shared_memory(draw_source_data_t *context)
 	return true;
 }
 
-extern "C" void shared_memory_exists(draw_source_data_t *context) {
+extern "C" void shared_memory_exists(draw_source_data_t *context)
+{
 	using namespace boost::interprocess;
 	try {
 		shared_memory_object shm(open_only, OBS_SHM_NAME, read_only);
-	} catch (interprocess_exception& ex) {
+	} catch (interprocess_exception &ex) {
 		init_shared_memory(context);
 	}
 }
