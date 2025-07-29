@@ -47,7 +47,8 @@ function Build {
     Push-Location -Stack BuildTemp
     Ensure-Location $ProjectRoot
 
-    $CmakeArgs = @('--preset', "windows-ci-${Target}")
+    $ToolchainFile = "$PSScriptRoot\..\vcpkg\scripts\buildsystems\vcpkg.cmake"
+    $CmakeArgs = @('--preset', "windows-ci-${Target}", "-DCMAKE_TOOLCHAIN_FILE=$ToolchainFile")
     $CmakeBuildArgs = @('--build')
     $CmakeInstallArgs = @()
 
