@@ -287,7 +287,6 @@ jobs:
         uses: MarkusJx/install-boost@v2.5.0
         with:
           boost_version: 1.82.0
-          toolset: msvc19.44
           platform_version: 2022
 
       - name: Build Plugin 🧱
