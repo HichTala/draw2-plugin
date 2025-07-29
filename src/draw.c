@@ -2,15 +2,8 @@
 // Created by HichTala on 24/06/25.
 //
 
-#ifdef _WIN32
-#define OBS_SHM_NAME L"Local\\obs_shared_memory"
-#define PYTHON_SHM_NAME L"Local\\python_shared_memory"
-#else
-#define OBS_SHM_NAME "/obs_shared_memory"
-#define PYTHON_SHM_NAME "/python_shared_memory"
-#endif
-
 #include "draw.h"
+#include "shared_memory_wrapper.h"
 
 #include <errno.h>
 
@@ -27,9 +20,6 @@ void *draw_source_create(obs_data_t *settings, obs_source_t *source)
 	context->shared_frame = NULL;
 	context->display_texture = NULL;
 	obs_source_update(source, NULL);
-#ifdef _WIN32
-	context->shared_frame_handle = NULL;
-#endif
 	return context;
 }
 
@@ -48,17 +38,7 @@ void draw_source_destroy(void *data)
 		obs_leave_graphics();
 	}
 	if (context->shared_frame) {
-#ifdef _WIN32
-		UnmapViewOfFile(context->shared_frame);
-		if (context->shared_frame_handle) {
-			CloseHandle(context->shared_frame_handle);
-			context->shared_frame_handle = NULL;
-		}
-#else
-		munmap(context->shared_frame, context->source_width * context->source_height * 4);
-		shm_unlink(OBS_SHM_NAME);
-#endif
-		context->shared_frame = NULL;
+		destroy_shared_memory(context);
 	}
 	bfree(context);
 }
@@ -83,11 +63,6 @@ void draw_source_get_defaults(obs_data_t *settings)
 	UNUSED_PARAMETER(settings);
 }
 
-struct shared_frame_header {
-	uint32_t width;
-	uint32_t height;
-};
-typedef struct shared_frame_header shared_frame_header_t;
 void draw_source_video_render(void *data, gs_effect_t *effect)
 {
 	UNUSED_PARAMETER(effect);
@@ -115,6 +90,8 @@ void draw_source_video_render(void *data, gs_effect_t *effect)
 		return;
 	}
 
+	ensure_shared_memory_exists(context);
+
 	struct vec4 clear_color;
 	vec4_set(&clear_color, 0.0f, 0.0f, 0.0f, 1.0f); // black
 	gs_clear(GS_CLEAR_COLOR, &clear_color, 0.0f, 0);
@@ -133,14 +110,7 @@ void draw_source_video_render(void *data, gs_effect_t *effect)
 
 			if (gs_stagesurface_map(stage, &frame, &linesize)) {
 				if (context->shared_frame) {
-					shared_frame_header_t *header = (shared_frame_header_t *)context->shared_frame;
-					header->width = width;
-					header->height = height;
-
-					uint8_t *frame_data = context->shared_frame + sizeof(shared_frame_header_t);
-					for (uint32_t y = 0; y < height; y++) {
-						memcpy(frame_data + y * width * 4, frame + y * linesize, width * 4);
-					}
+					write_message_to_shared_memory(context, frame, linesize, width, height);
 				}
 				gs_stagesurface_unmap(stage);
 			}
@@ -154,58 +124,9 @@ void draw_source_video_render(void *data, gs_effect_t *effect)
 	gs_texrender_destroy(render);
 	obs_source_release(source);
 
-#ifdef _WIN32
-	HANDLE python_shared_frame_handle = OpenFileMapping(FILE_MAP_READ, FALSE, PYTHON_SHM_NAME);
-	if (!python_shared_frame_handle) {
-		context->processing = false;
+	if (!read_shared_memory(context)) {
 		return;
 	}
-	LPVOID pBuf = MapViewOfFile(python_shared_frame_handle, FILE_MAP_READ, 0, 0, 0);
-	if (pBuf == NULL) {
-		CloseHandle(python_shared_frame_handle);
-		context->processing = false;
-		return;
-	}
-	shared_frame_header_t *python_header = (shared_frame_header_t *)pBuf;
-	uint8_t *python_shared_frame = (uint8_t *)pBuf;
-#else
-	int fd = shm_open(PYTHON_SHM_NAME, O_RDONLY, 0666);
-	if (fd < 0) {
-		context->processing = false;
-		return;
-	}
-
-	struct stat sb;
-	if (fstat(fd, &sb) == -1) {
-		close(fd);
-		context->processing = false;
-		return;
-	}
-
-	uint8_t *python_shared_frame = mmap(NULL, sb.st_size, PROT_READ, MAP_SHARED, fd, 0);
-	close(fd);
-	if (python_shared_frame == MAP_FAILED) {
-		context->processing = false;
-		return;
-	}
-	shared_frame_header_t *python_header = (shared_frame_header_t *)python_shared_frame;
-#endif
-	context->display_width = python_header->width;
-	context->display_height = python_header->height;
-	uint8_t *image_data = python_shared_frame + sizeof(shared_frame_header_t);
-
-	if (context->display_texture)
-		gs_texture_destroy(context->display_texture);
-	context->display_texture =
-		gs_texture_create(context->display_width, context->display_height, GS_RGBA, 1, NULL, GS_DYNAMIC);
-	gs_texture_set_image(context->display_texture, image_data, context->display_width * 4, false);
-
-#ifdef _WIN32
-	UnmapViewOfFile(pBuf);
-	CloseHandle(python_shared_frame_handle);
-#else
-	munmap(python_shared_frame, sb.st_size);
-#endif
 
 	gs_effect_t *default_effect = obs_get_base_effect(OBS_EFFECT_DEFAULT);
 	gs_eparam_t *image = gs_effect_get_param_by_name(default_effect, "image");
@@ -295,50 +216,6 @@ obs_properties_t *draw_source_get_properties(void *data)
 	return props;
 }
 
-void init_shared_memory(draw_source_data_t *context)
-{
-	size_t required_size =
-		sizeof(shared_frame_header_t) + (size_t)context->source_width * context->source_height * 4;
-#ifdef _WIN32
-	if (context->shared_frame_handle) {
-		CloseHandle(context->shared_frame_handle);
-		context->shared_frame_handle = NULL;
-	}
-	context->shared_frame_handle =
-		CreateFileMapping(INVALID_HANDLE_VALUE, NULL, PAGE_READWRITE, 0, (DWORD)required_size, OBS_SHM_NAME);
-	if (!context->shared_frame_handle)
-		return;
-
-	context->shared_frame =
-		(uint8_t *)MapViewOfFile(context->shared_frame_handle, FILE_MAP_WRITE, 0, 0, required_size);
-	if (!context->shared_frame) {
-		blog(LOG_ERROR, "Failed to map shared memory: %s", GetLastError());
-		CloseHandle(context->shared_frame_handle);
-		context->shared_frame_handle = NULL;
-		return;
-	}
-#else
-	if (context->shared_frame) {
-		munmap(context->shared_frame, required_size);
-		context->shared_frame = NULL;
-	}
-	const int fd = shm_open(OBS_SHM_NAME, O_RDWR | O_CREAT, 0666);
-
-	off_t truncate_size = (off_t)required_size;
-	if (truncate_size < 0) {
-		blog(LOG_ERROR, "Truncate size overflow: %zu bytes", required_size);
-		close(fd);
-		return;
-	}
-	if (ftruncate(fd, truncate_size) == -1) {
-		blog(LOG_ERROR, "Failed to truncate shared memory: %s", strerror(errno));
-		close(fd);
-		return;
-	}
-	context->shared_frame = mmap(NULL, required_size, PROT_WRITE, MAP_SHARED, fd, 0);
-	close(fd);
-#endif
-}
 void switch_source(draw_source_data_t *context, obs_source_t *source)
 {
 	obs_source_t *prev_source = obs_weak_source_get_source(context->source);
