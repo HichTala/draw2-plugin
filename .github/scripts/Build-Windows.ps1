@@ -70,6 +70,16 @@ function Build {
         '--config', $Configuration
     )
 
+    if ($env:BOOST_ROOT) {
+        if ($env:CMAKE_PREFIX_PATH) {
+            $env:CMAKE_PREFIX_PATH = "$env:BOOST_ROOT;$env:CMAKE_PREFIX_PATH"
+        } else {
+            $env:CMAKE_PREFIX_PATH = "$env:BOOST_ROOT"
+        }
+        Write-Host "Boost_DIR set to $env:BOOST_ROOT"
+        Write-Host "CMAKE_PREFIX_PATH set to $env:CMAKE_PREFIX_PATH"
+    }
+
     Log-Group "Configuring ${ProductName}..."
     Invoke-External cmake @CmakeArgs
 

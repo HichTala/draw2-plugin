@@ -284,13 +284,22 @@ jobs:
           "pluginVersion=${ProductVersion}" >> $env:GITHUB_OUTPUT
 
       - name: Install Boost 🚀
-        run: vcpkg install boost
+        uses: MarkusJx/install-boost@v2.5.0
+        id: install-boost
+        with:
+          boost_version: 1.88.0
+          toolset: msvc
+          platform_version: 2025
+          link: static
+          arch: x86
+          cache: true
 
       - name: Build Plugin 🧱
         uses: ./.github/actions/build-plugin
         with:
           target: x64
           config: ${{ needs.check-event.outputs.config }}
+          boostRoot: ${{ steps.install-boost.outputs.BOOST_ROOT }}
 
       - name: Package Plugin 📀
         uses: ./.github/actions/package-plugin
