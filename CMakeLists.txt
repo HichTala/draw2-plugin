@@ -28,6 +28,7 @@ find_package(libobs REQUIRED)
 target_link_libraries(${CMAKE_PROJECT_NAME} PRIVATE OBS::libobs)
 
 find_package(Boost REQUIRED)
+include_directories(${Boost_INCLUDE_DIRS})
 
 if(ENABLE_FRONTEND_API)
   find_package(obs-frontend-api REQUIRED)
