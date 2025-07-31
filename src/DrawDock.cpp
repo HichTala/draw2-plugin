@@ -158,12 +158,19 @@ void DrawDock::initialize_python_interpreter()
 
 		QSettings settings = QSettings("HichTala", "Draw2");
 		QByteArray pyHome = settings.value("python_path", "").toString().toUtf8();
+		qputenv("PYTHONHOME", QByteArray(pyHome));
+
 		QString pythonVersion;
 		{
-			// Execute a Python script to get the version dynamically
+#ifdef _WIN32
+			FILE *pipe = _popen(
+				"python -c \"import sys; print(f'{sys.version_info.major}.{sys.version_info.minor}')\"",
+				"r");
+#else
 			FILE *pipe = popen(
 				"python3 -c \"import sys; print(f'{sys.version_info.major}.{sys.version_info.minor}')\"",
 				"r");
+#endif
 			if (!pipe) {
 				blog(LOG_ERROR, "Failed to retrieve Python version");
 				return;
@@ -172,7 +179,11 @@ void DrawDock::initialize_python_interpreter()
 			if (fgets(buffer, sizeof(buffer), pipe) != nullptr) {
 				pythonVersion = QString::fromUtf8(buffer).trimmed();
 			}
+#ifdef _WIN32
+			_pclose(pipe);
+#else
 			pclose(pipe);
+#endif
 		}
 
 		QString sitePackagesPath = pyHome + "/lib/python" + pythonVersion + "/site-packages";
@@ -180,7 +191,6 @@ void DrawDock::initialize_python_interpreter()
 		blog(LOG_INFO, "Initializing Python interpreter with site packages: %s",
 		     sitePackagesPath.toStdString().c_str());
 
-		qputenv("PYTHONHOME", QByteArray(pyHome));
 		qputenv("PYTHONPATH", QByteArray(sitePackagesPath.toUtf8()));
 
 		Py_Initialize();
