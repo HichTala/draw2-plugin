@@ -79,9 +79,7 @@ void DrawDock::StartPythonDraw()
 		PyGILState_STATE gstate = PyGILState_Ensure();
 		blog(LOG_INFO, "Starting Draw2 python backend");
 
-		PyObject *pName = PyUnicode_FromString("draw");
 		PyObject *pModule = PyImport_ImportModule("draw");
-		Py_DECREF(pName);
 
 		if (pModule) {
 			PyObject *pFunc = PyObject_GetAttrString(pModule, "run");
@@ -151,7 +149,7 @@ void DrawDock::StopPythonDraw()
 	}
 }
 
-void DrawDock::initialize_python_interpreter() const
+void DrawDock::initialize_python_interpreter()
 {
 	blog(LOG_INFO, "Initializing Python interpreter ");
 
@@ -160,8 +158,22 @@ void DrawDock::initialize_python_interpreter() const
 
 		QSettings settings = QSettings("HichTala", "Draw2");
 		QByteArray pyHome = settings.value("python_path", "").toString().toUtf8();
-		QString sitePackagesPath = pyHome + "/lib/python3.12/site-packages";
+		QString pythonVersion;
+		{
+			// Execute a Python script to get the version dynamically
+			FILE* pipe = popen("python3 -c \"import sys; print(f'{sys.version_info.major}.{sys.version_info.minor}')\"", "r");
+			if (!pipe) {
+				blog(LOG_ERROR, "Failed to retrieve Python version");
+				return;
+			}
+			char buffer[128];
+			if (fgets(buffer, sizeof(buffer), pipe) != nullptr) {
+				pythonVersion = QString::fromUtf8(buffer).trimmed();
+			}
+			pclose(pipe);
+		}
 
+		QString sitePackagesPath = pyHome + "/lib/python" + pythonVersion + "/site-packages";
 		blog(LOG_INFO, "Initializing Python interpreter with home: %s", pyHome.toStdString().c_str());
 		blog(LOG_INFO, "Initializing Python interpreter with site packages: %s",
 		     sitePackagesPath.toStdString().c_str());
