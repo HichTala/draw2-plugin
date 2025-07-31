@@ -26,16 +26,17 @@ private:
 	QWidget *parent = nullptr;
 	QPushButton *start_button = new QPushButton();
 	QPushButton *settings_button = new QPushButton();
-	// std::thread python_thread;
-	// std::atomic<bool> should_run = false;
-	// std::atomic<bool> model_ready = false;
-	// std::atomic<bool> running_flag = false;
+	std::thread python_thread;
+	std::atomic<bool> should_run = false;
+	std::atomic<bool> model_ready = false;
+	std::atomic<bool> running_flag = false;
 
 private slots:
 	void StartButtonClicked();
 	void SettingsButtonClicked();
-	// void StartPythonDraw();
-	// void StopPythonDraw();
+	void StartPythonDraw();
+	void StopPythonDraw();
+	void initialize_python_interpreter();
 };
 
 void initialize_python_interpreter();
