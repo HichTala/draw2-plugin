@@ -196,7 +196,7 @@ void DrawDock::initialize_python_interpreter()
 		blog(LOG_INFO, "Initializing Python interpreter with site packages: %s",
 		     sitePackagesPath.toStdString().c_str());
 		qputenv("PYTHONHOME", QByteArray(pyHome));
-		qputenv("PYTHONPATH", QByteArray(sitePackagesPath.toUtf8()));
+		// qputenv("PYTHONPATH", QByteArray(sitePackagesPath.toUtf8()));
 
 		Py_Initialize();
 	}
