@@ -202,7 +202,7 @@ void DrawDock::initialize_python_interpreter()
 
 		PyStatus status = Py_InitializeFromConfig(&config);
 		if (PyStatus_Exception(status) || !Py_IsInitialized()) {
-			blog(LOG_INFO, "Failed to initialize Python interpreter");
+			blog(LOG_INFO, "Failed to initialize Python interpreter: %s", status.err_msg);
 			PyConfig_Clear(&config);
 			return;
 		}
