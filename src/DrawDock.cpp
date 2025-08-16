@@ -162,7 +162,7 @@ void DrawDock::initialize_python_interpreter()
 
 	this->start_button->setDisabled(true);
 
-	wchar_t pythonPath[256 * 3];
+	// wchar_t pythonPath[256 * 3];
 	wchar_t pythonExe[256];
 	wchar_t pythonHome[256];
 	if (!Py_IsInitialized()) {
@@ -175,7 +175,7 @@ void DrawDock::initialize_python_interpreter()
 			return;
 		}
 
-		QByteArray pyPath = pyHome + "/Lib/site-packages";
+		// QByteArray pyPath = pyHome + "/Lib/site-packages";
 		QByteArray pyExe = pyHome + "/python.exe";
 
 		wcsncpy(pythonHome, QString::fromUtf8(pyHome).toStdWString().c_str(),
@@ -191,7 +191,7 @@ void DrawDock::initialize_python_interpreter()
 		pythonExe[sizeof(pythonExe) / sizeof(wchar_t) - 1] = L'\0';
 
 		blog(LOG_INFO, "Python Home: %ls", pythonHome);
-		blog(LOG_INFO, "Python Path: %ls", pythonPath);
+		// blog(LOG_INFO, "Python Path: %ls", pythonPath);
 		blog(LOG_INFO, "Python Executable: %ls", pythonExe);
 
 		PyConfig config;
