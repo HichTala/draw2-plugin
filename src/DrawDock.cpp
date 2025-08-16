@@ -236,7 +236,6 @@ void DrawDock::initialize_python_interpreter()
 		pclose(pipe);
 		QString sitePackagesPath = pyHome + "/lib/python" + pythonVersion + "/site-packages";
 		QFileInfo sitePackagesPathInfo(sitePackagesPath);
-#endif
 
 		if (!sitePackagesPathInfo.exists() || !sitePackagesPathInfo.isDir()) {
 			blog(LOG_INFO, "Failed to initialize Python interpreter");
@@ -249,6 +248,7 @@ void DrawDock::initialize_python_interpreter()
 		qputenv("PYTHONHOME", QByteArray(pyHome));
 		qputenv("PYTHONPATH", QByteArray(sitePackagesPath.toUtf8()));
 
+#endif
 		Py_Initialize();
 	}
 
