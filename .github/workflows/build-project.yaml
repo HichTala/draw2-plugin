@@ -109,6 +109,9 @@ jobs:
           read -r product_name product_version <<< \
             "$(jq -r '. | {name, version} | join(" ")' buildspec.json)"
 
+          sudo apt-get update
+          sudo apt-get install -y build-essential cmake pkg-config libsimde-dev
+
           print "pluginName=${product_name}" >> $GITHUB_OUTPUT
           print "pluginVersion=${product_version}" >> $GITHUB_OUTPUT
 
