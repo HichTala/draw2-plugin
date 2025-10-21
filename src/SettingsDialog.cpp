@@ -11,10 +11,21 @@
 
 #include <util/base.h>
 
+#ifdef _WIN32
+#include <windows.h>
+#include <shellapi.h>
+#pragma comment(lib, "Shell32.lib")
+#endif
+
 void open_folder(const std::string &folder_path)
 {
 #ifdef _WIN32
-	ShellExecuteA(NULL, "open", folder_path.c_str(), NULL, NULL, SW_SHOWNORMAL);
+	std::wstring wpath = std::filesystem::path(folder_path).wstring();
+
+	HINSTANCE result = ShellExecuteW(NULL, L"open", wpath.c_str(), NULL, NULL, SW_SHOWNORMAL);
+	if ((INT_PTR)result <= 32) {
+		blog(LOG_INFO, "error");
+	}
 #elif __APPLE__
 	std::string command = "open " + folder_path;
 	int return_value = system(command.c_str());
