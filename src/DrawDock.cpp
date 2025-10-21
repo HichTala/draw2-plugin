@@ -106,11 +106,14 @@ void DrawDock::StartPythonDraw()
 				QByteArray deck_list_path2 = settings.value("deck_list2", "").toString().toUtf8();
 				QByteArray deck_list_path3 = settings.value("deck_list3", "").toString().toUtf8();
 				const char *plugin_dir = get_plugin_path();
-				PyTuple_SetItem(args, 2, PyUnicode_FromString((
-					plugin_dir + std::string("/decklists/") + std::string(deck_list_path1) + std::string(";") +
-					plugin_dir + std::string("/decklists/") + std::string(deck_list_path2) + std::string(";") +
-					plugin_dir + std::string("/decklists/") + std::string(deck_list_path3) + std::string(";")
-				).c_str()));
+				PyTuple_SetItem(args, 2,
+						PyUnicode_FromString((plugin_dir + std::string("/decklists/") +
+								      std::string(deck_list_path1) + std::string(";") +
+								      plugin_dir + std::string("/decklists/") +
+								      std::string(deck_list_path2) + std::string(";") +
+								      plugin_dir + std::string("/decklists/") +
+								      std::string(deck_list_path3) + std::string(";"))
+									     .c_str()));
 
 				int minimum_out_of_screen_time_value =
 					settings.value("minimum_out_of_screen_time", 25).value<int>();
@@ -217,8 +220,7 @@ void DrawDock::initialize_python_interpreter() const
 			sizeof(pythonExe) / sizeof(wchar_t));
 		pythonExe[sizeof(pythonExe) / sizeof(wchar_t) - 1] = L'\0';
 
-		wcsncpy(pythonPath, sitePackagesPath.toStdWString().c_str(),
-			sizeof(pythonPath) / sizeof(wchar_t));
+		wcsncpy(pythonPath, sitePackagesPath.toStdWString().c_str(), sizeof(pythonPath) / sizeof(wchar_t));
 		pythonPath[sizeof(pythonPath) / sizeof(wchar_t) - 1] = L'\0';
 
 		blog(LOG_INFO, "Python Home: %ls", pythonHome);

@@ -11,7 +11,8 @@
 
 #include <util/base.h>
 
-void open_folder(const std::string& folder_path) {
+void open_folder(const std::string &folder_path)
+{
 #ifdef _WIN32
 	ShellExecuteA(NULL, "open", folder_path.c_str(), NULL, NULL, SW_SHOWNORMAL);
 #elif __APPLE__
@@ -66,7 +67,7 @@ SettingsDialog::SettingsDialog(QWidget *parent) : QDialog(parent)
 	this->deck_list1->addItem("(None)");
 	this->deck_list2->addItem("(None)");
 	this->deck_list3->addItem("(None)");
-	for (const QFileInfo& file : files) {
+	for (const QFileInfo &file : files) {
 		this->deck_list1->addItem(file.fileName());
 		this->deck_list2->addItem(file.fileName());
 		this->deck_list3->addItem(file.fileName());
