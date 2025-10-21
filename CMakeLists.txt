@@ -22,7 +22,7 @@ add_library(
   src/draw.h
   src/shared_memory_wrapper.cpp
   src/shared_memory_wrapper.h
-        src/plugin-path.h
+  src/plugin-path.h
 )
 
 find_package(libobs REQUIRED)
