@@ -7,13 +7,33 @@
 
 #include "SettingsDialog.hpp"
 
+#include "plugin-path.h"
+
+#include <util/base.h>
+
+void open_folder(const std::string& folder_path) {
+#ifdef _WIN32
+	ShellExecuteA(NULL, "open", folder_path.c_str(), NULL, NULL, SW_SHOWNORMAL);
+#elif __APPLE__
+	std::string command = "open " + folder_path;
+	int return_value = system(command.c_str());
+	blog(LOG_INFO, "xdg-open returned %d", return_value);
+#else // Linux/Unix
+	std::string command = "xdg-open " + folder_path;
+	int return_value = system(command.c_str());
+	blog(LOG_INFO, "xdg-open returned %d", return_value);
+#endif
+}
+
 SettingsDialog::SettingsDialog(QWidget *parent) : QDialog(parent)
 {
 	setWindowTitle("Draw 2 Settings");
 
 	QSettings settings = QSettings("HichTala", "Draw2");
 
-	QString deck_list_path = settings.value("deck_list", "").toString();
+	QString deck_list_path1 = settings.value("deck_list1", "").toString();
+	QString deck_list_path2 = settings.value("deck_list2", "").toString();
+	QString deck_list_path3 = settings.value("deck_list3", "").toString();
 	QString python_path_string = settings.value("python_path", "").toString();
 	int minimum_out_of_screen_time_value = settings.value("minimum_out_of_screen_time", 25).value<int>();
 	int minimum_screen_time_value = settings.value("minimum_screen_time", 6).value<int>();
@@ -30,14 +50,44 @@ SettingsDialog::SettingsDialog(QWidget *parent) : QDialog(parent)
 	python_browse_layout->addWidget(this->python_browse_button);
 	layout->addLayout(python_browse_layout);
 
-	auto *label = new QLabel("Select Deck List to use (leave empty if none):", this);
-	layout->addWidget(label);
-
 	auto *browse_layout = new QHBoxLayout();
-	this->deck_list->setText(deck_list_path);
-	browse_layout->addWidget(this->deck_list);
+	auto *label = new QLabel("Select Deck Lists to use:", this);
+	browse_layout->addWidget(label);
+	this->browse_button->setMaximumWidth(125);
 	browse_layout->addWidget(this->browse_button);
 	layout->addLayout(browse_layout);
+
+	const char *plugin_dir = get_plugin_path();
+	QDir dir(((plugin_dir + std::string("/decklists/")).data()));
+	QFileInfoList files = dir.entryInfoList(QDir::Files);
+	this->deck_list1->setMaximumWidth(125);
+	this->deck_list2->setMaximumWidth(125);
+	this->deck_list3->setMaximumWidth(125);
+	this->deck_list1->addItem("(None)");
+	this->deck_list2->addItem("(None)");
+	this->deck_list3->addItem("(None)");
+	for (const QFileInfo& file : files) {
+		this->deck_list1->addItem(file.fileName());
+		this->deck_list2->addItem(file.fileName());
+		this->deck_list3->addItem(file.fileName());
+	}
+	int index1 = this->deck_list1->findText(deck_list_path1, Qt::MatchExactly);
+	int index2 = this->deck_list2->findText(deck_list_path2, Qt::MatchExactly);
+	int index3 = this->deck_list3->findText(deck_list_path3, Qt::MatchExactly);
+	if (index1 != -1) {
+		this->deck_list1->setCurrentIndex(index1);
+	}
+	if (index2 != -1) {
+		this->deck_list2->setCurrentIndex(index2);
+	}
+	if (index3 != -1) {
+		this->deck_list3->setCurrentIndex(index3);
+	}
+	auto *decklist_layout = new QHBoxLayout();
+	decklist_layout->addWidget(this->deck_list1);
+	decklist_layout->addWidget(this->deck_list2);
+	decklist_layout->addWidget(this->deck_list3);
+	layout->addLayout(decklist_layout);
 
 	this->minimum_out_of_screen_time->setValue(minimum_out_of_screen_time_value);
 	auto *minimum_out_of_screen_label = new QLabel("Minimum Out of Screen Time (seconds):", this);
@@ -90,17 +140,18 @@ void SettingsDialog::PythonBrowseButtonClicked()
 
 void SettingsDialog::BrowseButtonClicked()
 {
-	QString filePath = QFileDialog::getOpenFileName(this, "Select Deck List File");
-	if (!filePath.isEmpty()) {
-		this->deck_list->setText(filePath);
-	}
+	const char *plugin_dir = get_plugin_path();
+	blog(LOG_INFO, "%s", plugin_dir);
+	open_folder(plugin_dir + std::string("/decklists/"));
 }
 
 void SettingsDialog::OkButtonClicked()
 {
 	QSettings settings("HichTala", "Draw2");
 
-	settings.setValue("deck_list", this->deck_list->text());
+	settings.setValue("deck_list1", this->deck_list1->currentText());
+	settings.setValue("deck_list2", this->deck_list2->currentText());
+	settings.setValue("deck_list3", this->deck_list3->currentText());
 	settings.setValue("python_path", this->python_path->text());
 	settings.setValue("minimum_screen_time", this->minimum_screen_time->value());
 	settings.setValue("minimum_out_of_screen_time", this->minimum_out_of_screen_time->value());

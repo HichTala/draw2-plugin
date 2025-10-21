@@ -3,6 +3,8 @@
 //
 #define PY_SSIZE_T_CLEAN
 
+#include "plugin-path.h"
+
 #include <Python.h>
 #include <stdio.h>
 #include <wchar.h>
@@ -100,8 +102,15 @@ void DrawDock::StartPythonDraw()
 
 				QSettings settings = QSettings("HichTala", "Draw2");
 
-				QByteArray deck_list_path = settings.value("deck_list", "").toString().toUtf8();
-				PyTuple_SetItem(args, 2, PyUnicode_FromString(deck_list_path.constData()));
+				QByteArray deck_list_path1 = settings.value("deck_list1", "").toString().toUtf8();
+				QByteArray deck_list_path2 = settings.value("deck_list2", "").toString().toUtf8();
+				QByteArray deck_list_path3 = settings.value("deck_list3", "").toString().toUtf8();
+				const char *plugin_dir = get_plugin_path();
+				PyTuple_SetItem(args, 2, PyUnicode_FromString((
+					plugin_dir + std::string("/decklists/") + std::string(deck_list_path1) + std::string(";") +
+					plugin_dir + std::string("/decklists/") + std::string(deck_list_path2) + std::string(";") +
+					plugin_dir + std::string("/decklists/") + std::string(deck_list_path3) + std::string(";")
+				).c_str()));
 
 				int minimum_out_of_screen_time_value =
 					settings.value("minimum_out_of_screen_time", 25).value<int>();
@@ -110,7 +119,7 @@ void DrawDock::StartPythonDraw()
 				int minimum_screen_time_value = settings.value("minimum_screen_time", 6).value<int>();
 				PyTuple_SetItem(args, 4, PyLong_FromLong(minimum_screen_time_value));
 
-				int confidence_value = settings.value("confidence_slider", 1).value<int>();
+				int confidence_value = settings.value("confidence_slider", 5).value<int>();
 				PyTuple_SetItem(args, 5, PyLong_FromLong(confidence_value));
 
 				PyObject_CallObject(pFunc, args);
@@ -135,7 +144,7 @@ void DrawDock::StartPythonDraw()
 				blog(LOG_INFO, "Draw2 python backend started successfully");
 				break;
 			}
-			std::this_thread::sleep_for(std::chrono::milliseconds(1000));
+			std::this_thread::sleep_for(std::chrono::milliseconds(100));
 		}
 		if (!this->start_button->isEnabled()) {
 			this->start_button->setDisabled(true);
@@ -156,14 +165,14 @@ void DrawDock::StopPythonDraw()
 	}
 }
 
-void DrawDock::initialize_python_interpreter()
+void DrawDock::initialize_python_interpreter() const
 {
 	blog(LOG_INFO, "Initializing Python interpreter ");
 
 	this->start_button->setDisabled(true);
 
-	// wchar_t pythonPath[256 * 3];
 	wchar_t pythonExe[256];
+	wchar_t pythonPath[256];
 	wchar_t pythonHome[256];
 	if (!Py_IsInitialized()) {
 
@@ -174,31 +183,53 @@ void DrawDock::initialize_python_interpreter()
 			blog(LOG_INFO, "Failed to initialize Python interpreter");
 			return;
 		}
-
-		// QByteArray pyPath = pyHome + "/Lib/site-packages";
+#ifdef _WIN32
+		QString sitePackagesPath = pyHome + "/Lib/site-packages";
 		QByteArray pyExe = pyHome + "/python.exe";
+#else
+		QString pythonVersion;
+		FILE *pipe = popen(
+			"python3 -c \"import sys; print(f'{sys.version_info.major}.{sys.version_info.minor}')\"", "r");
+		if (!pipe) {
+			blog(LOG_ERROR, "Failed to retrieve Python version");
+			return;
+		}
+		char buffer[128];
+		if (fgets(buffer, sizeof(buffer), pipe) != nullptr) {
+			pythonVersion = QString::fromUtf8(buffer).trimmed();
+		}
+		pclose(pipe);
+		QString sitePackagesPath = pyHome + "/lib/python" + pythonVersion + "/site-packages";
+		QFileInfo sitePackagesPathInfo(sitePackagesPath);
+
+		if (!sitePackagesPathInfo.exists() || !sitePackagesPathInfo.isDir()) {
+			blog(LOG_INFO, "Failed to initialize Python interpreter");
+			return;
+		}
+		QByteArray pyExe = pyHome + "/bin/python";
+#endif
 
 		wcsncpy(pythonHome, QString::fromUtf8(pyHome).toStdWString().c_str(),
 			sizeof(pythonHome) / sizeof(wchar_t));
 		pythonHome[sizeof(pythonHome) / sizeof(wchar_t) - 1] = L'\0';
 
-		// wcsncpy(pythonPath, QString::fromUtf8(pyPath).toStdWString().c_str(),
-		// 	sizeof(pythonPath) / sizeof(wchar_t));
-		// pythonPath[sizeof(pythonPath) / sizeof(wchar_t) - 1] = L'\0';
-
 		wcsncpy(pythonExe, QString::fromUtf8(pyExe).toStdWString().c_str(),
 			sizeof(pythonExe) / sizeof(wchar_t));
 		pythonExe[sizeof(pythonExe) / sizeof(wchar_t) - 1] = L'\0';
 
+		wcsncpy(pythonPath, sitePackagesPath.toStdWString().c_str(),
+			sizeof(pythonPath) / sizeof(wchar_t));
+		pythonPath[sizeof(pythonPath) / sizeof(wchar_t) - 1] = L'\0';
+
 		blog(LOG_INFO, "Python Home: %ls", pythonHome);
-		// blog(LOG_INFO, "Python Path: %ls", pythonPath);
+		blog(LOG_INFO, "Python Path: %ls", pythonPath);
 		blog(LOG_INFO, "Python Executable: %ls", pythonExe);
 
 		PyConfig config;
 		PyConfig_InitPythonConfig(&config);
 		PyConfig_SetString(&config, &config.executable, pythonExe);
-		PyConfig_SetString(&config, &config.home, pythonHome);
-		// PyConfig_SetString(&config, &config.pythonpath_env, pythonPath);
+		// PyConfig_SetString(&config, &config.home, pythonHome);
+		PyConfig_SetString(&config, &config.pythonpath_env, pythonPath);
 
 		PyStatus status = Py_InitializeFromConfig(&config);
 		if (PyStatus_Exception(status) || !Py_IsInitialized()) {
@@ -206,79 +237,16 @@ void DrawDock::initialize_python_interpreter()
 			PyConfig_Clear(&config);
 			return;
 		}
-		// std::wstring pythonPathW(pythonPath);
-		//
-		// std::wstring_convert<std::codecvt_utf8<wchar_t>> conv;
-		// std::string pythonPathUtf8 = conv.to_bytes(pythonPathW);
-		// std::string cmd = "import sys; sys.path.append(r'" + pythonPathUtf8 + "')";
-		// PyRun_SimpleString(cmd.c_str());
 
 		PyConfig_Clear(&config);
-		// #ifdef _WIN32
-		//
-		// 		wcsncpy(pythonHome, QString::fromUtf8(pyHome).toStdWString().c_str(),
-		// 			sizeof(pythonHome) / sizeof(wchar_t));
-		//
-		// 		pythonHome[sizeof(pythonHome) / sizeof(wchar_t) - 1] = L'\0';
-		//
-		// 		_snwprintf_s(pythonExe, _countof(pythonExe), _TRUNCATE, L"%s\\python.exe", pythonHome);
-		//
-		// 		// Build pythonPath = "<pythonHome>\\Lib;<pythonHome>\\DLLs;<pythonHome>\\Lib\\site-packages"
-		// 		_snwprintf_s(pythonPath, _countof(pythonPath), _TRUNCATE, L"%s\\Lib;%s\\DLLs;%s\\Lib\\site-packages",
-		// 			     pythonHome, pythonHome, pythonHome);
-		//
-		// 		blog(LOG_INFO, "Python Home: %ls", pythonHome);
-		// 		blog(LOG_INFO, "Python Path: %ls", pythonPath);
-		// 		blog(LOG_INFO, "Python Executable: %ls", pythonExe);
-		//
-		// 		PyConfig config;
-		// 		PyConfig_InitPythonConfig(&config);
-		// 		PyConfig_SetString(&config, &config.executable, pythonExe);
-		// 		PyConfig_SetString(&config, &config.home, pythonHome);
-		// 		PyConfig_SetString(&config, &config.pythonpath_env, pythonPath);
-		//
-		// 		PyStatus status = Py_InitializeFromConfig(&config);
-		// 		if (PyStatus_Exception(status) || !Py_IsInitialized()) {
-		// 			PyConfig_Clear(&config);
-		// 			return;
-		// 		}
-		//
-		// 		PyConfig_Clear(&config);
-		//
-		// 		// QString sitePackagesPath = pyHome + "/Lib/site-packages";
-		// 		// QFileInfo sitePackagesPathInfo(sitePackagesPath);
-		// #else
-		// 		QString pythonVersion;
-		// 		FILE *pipe = popen(
-		// 			"python3 -c \"import sys; print(f'{sys.version_info.major}.{sys.version_info.minor}')\"", "r");
-		// 		if (!pipe) {
-		// 			blog(LOG_ERROR, "Failed to retrieve Python version");
-		// 			return;
-		// 		}
-		// 		char buffer[128];
-		// 		if (fgets(buffer, sizeof(buffer), pipe) != nullptr) {
-		// 			pythonVersion = QString::fromUtf8(buffer).trimmed();
-		// 		}
-		// 		pclose(pipe);
-		// 		QString sitePackagesPath = pyHome + "/lib/python" + pythonVersion + "/site-packages";
-		// 		QFileInfo sitePackagesPathInfo(sitePackagesPath);
-		//
-		// 		if (!sitePackagesPathInfo.exists() || !sitePackagesPathInfo.isDir()) {
-		// 			blog(LOG_INFO, "Failed to initialize Python interpreter");
-		// 			return;
-		// 		}
-		//
-		// 		blog(LOG_INFO, "Initializing Python interpreter with home: %s", pyHome.toStdString().c_str());
-		// 		blog(LOG_INFO, "Initializing Python interpreter with site packages: %s",
-		// 		     sitePackagesPath.toStdString().c_str());
-		// 		qputenv("PYTHONHOME", QByteArray(pyHome));
-		// 		qputenv("PYTHONPATH", QByteArray(sitePackagesPath.toUtf8()));
-		//
-		// 		Py_Initialize();
-		// #endif
 	}
 
 	if (Py_IsInitialized()) {
+		PyObject *pModule = PyImport_ImportModule("draw");
+		if (!pModule) {
+			blog(LOG_ERROR, "Failed to import draw_module.");
+			return;
+		}
 		blog(LOG_INFO, "Python interpreter initialized successfully");
 		this->start_button->setEnabled(true);
 	} else {

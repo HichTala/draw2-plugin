@@ -12,6 +12,7 @@
 #include <QLineEdit>
 #include <QSlider>
 #include <QSpinBox>
+#include <QComboBox>
 
 class SettingsDialog : public QDialog {
 	Q_OBJECT
@@ -21,12 +22,14 @@ public:
 
 private:
 	QLineEdit *python_path = new QLineEdit();
-	QLineEdit *deck_list = new QLineEdit();
+	QComboBox *deck_list1 = new QComboBox();
+	QComboBox *deck_list2 = new QComboBox();
+	QComboBox *deck_list3 = new QComboBox();
 	QSpinBox *minimum_out_of_screen_time = new QSpinBox;
 	QSpinBox *minimum_screen_time = new QSpinBox;
 	QSlider *confidence_slider = new QSlider(Qt::Horizontal);
 	QPushButton *python_browse_button = new QPushButton("Browse");
-	QPushButton *browse_button = new QPushButton("Browse");
+	QPushButton *browse_button = new QPushButton("Open Folder");
 	QPushButton *ok_button = new QPushButton("&OK");
 	QPushButton *cancel_button = new QPushButton("&Cancel");
 

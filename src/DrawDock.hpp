@@ -36,7 +36,7 @@ private slots:
 	void SettingsButtonClicked();
 	void StartPythonDraw();
 	void StopPythonDraw();
-	void initialize_python_interpreter();
+	void initialize_python_interpreter() const;
 };
 
 void initialize_python_interpreter();

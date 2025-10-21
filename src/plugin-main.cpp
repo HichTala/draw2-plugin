@@ -20,6 +20,7 @@ with this program. If not, see <https://www.gnu.org/licenses/>
 #include <obs-frontend-api.h>
 #include <obs-module.h>
 #include <plugin-support.h>
+#include <plugin-path.h>
 
 #include "DrawDock.hpp"
 
@@ -30,8 +31,14 @@ extern "C" {
 OBS_DECLARE_MODULE()
 OBS_MODULE_USE_DEFAULT_LOCALE(PLUGIN_NAME, "en-US")
 
+static const char *module_path = nullptr;
+
 bool obs_module_load(void)
 {
+	module_path = obs_get_module_data_path(obs_current_module());
+
+	obs_log(LOG_INFO, "Loaded from: %s", module_path);
+
 	auto *main_window = static_cast<QWidget *>(obs_frontend_get_main_window());
 	auto *dock = new DrawDock(main_window);
 
@@ -44,4 +51,9 @@ bool obs_module_load(void)
 void obs_module_unload(void)
 {
 	obs_log(LOG_INFO, "plugin unloaded");
+}
+
+const char *get_plugin_path()
+{
+	return module_path;
 }
