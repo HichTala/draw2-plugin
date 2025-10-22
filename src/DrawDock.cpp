@@ -175,7 +175,7 @@ void DrawDock::initialize_python_interpreter() const
 	this->start_button->setDisabled(true);
 
 	wchar_t pythonExe[256];
-	wchar_t pythonPath[256];
+	wchar_t pythonPath[512];
 	wchar_t pythonHome[256];
 	if (!Py_IsInitialized()) {
 
@@ -210,6 +210,9 @@ void DrawDock::initialize_python_interpreter() const
 			return;
 		}
 		QByteArray pyExe = pyHome + "/bin/python";
+
+		wcsncpy(pythonPath, sitePackagesPath.toStdWString().c_str(), sizeof(pythonPath) / sizeof(wchar_t));
+		pythonPath[sizeof(pythonPath) / sizeof(wchar_t) - 1] = L'\0';
 #endif
 
 		wcsncpy(pythonHome, QString::fromUtf8(pyHome).toStdWString().c_str(),
@@ -220,19 +223,18 @@ void DrawDock::initialize_python_interpreter() const
 			sizeof(pythonExe) / sizeof(wchar_t));
 		pythonExe[sizeof(pythonExe) / sizeof(wchar_t) - 1] = L'\0';
 
-		wcsncpy(pythonPath, sitePackagesPath.toStdWString().c_str(), sizeof(pythonPath) / sizeof(wchar_t));
-		pythonPath[sizeof(pythonPath) / sizeof(wchar_t) - 1] = L'\0';
 
 		blog(LOG_INFO, "Python Home: %ls", pythonHome);
-		blog(LOG_INFO, "Python Path: %ls", pythonPath);
 		blog(LOG_INFO, "Python Executable: %ls", pythonExe);
 
 		PyConfig config;
 		PyConfig_InitPythonConfig(&config);
 		PyConfig_SetString(&config, &config.executable, pythonExe);
-		// PyConfig_SetString(&config, &config.home, pythonHome);
-		PyConfig_SetString(&config, &config.pythonpath_env, pythonPath);
+		PyConfig_SetString(&config, &config.home, pythonHome);
 
+#ifndef _WIN32
+		PyConfig_SetString(&config, &config.pythonpath_env, pythonPath);
+#endif
 		PyStatus status = Py_InitializeFromConfig(&config);
 		if (PyStatus_Exception(status) || !Py_IsInitialized()) {
 			blog(LOG_INFO, "Failed to initialize Python interpreter: %s", status.err_msg);
