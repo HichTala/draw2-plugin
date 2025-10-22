@@ -230,14 +230,20 @@ void DrawDock::initialize_python_interpreter() const
 		PyConfig_InitPythonConfig(&config);
 		PyConfig_SetString(&config, &config.executable, pythonExe);
 		PyConfig_SetString(&config, &config.home, pythonHome);
-		config.dev_mode = 1;
-		config.parse_argv = 0;
+
+		// print config values you will pass
+		blog(LOG_INFO, "Python Home (wchar): %ls", pythonHome);
+		blog(LOG_INFO, "Python Executable (wchar): %ls", pythonExe);
+
+		// also print env vars (POSIX example)
+		const char* pyhome_env = getenv("PYTHONHOME");
+		const char* pypath_env = getenv("PYTHONPATH");
+		const char* lang = getenv("LANG");
+		blog(LOG_INFO, "PYTHONHOME env: %s, PYTHONPATH env: %s, LANG: %s", pyhome_env ? pyhome_env : "(null)", pypath_env ? pypath_env : "(null)", lang ? lang : "(null)");
+
 
 #ifndef _WIN32
 		PyConfig_SetString(&config, &config.pythonpath_env, pythonPath);
-#else
-		_putenv("PYTHONVERBOSE=1");
-		_putenv("PYTHONDEBUG=1");
 #endif
 		PyStatus status = Py_InitializeFromConfig(&config);
 		if (PyStatus_Exception(status) || !Py_IsInitialized()) {
