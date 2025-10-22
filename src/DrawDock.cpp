@@ -223,7 +223,6 @@ void DrawDock::initialize_python_interpreter() const
 			sizeof(pythonExe) / sizeof(wchar_t));
 		pythonExe[sizeof(pythonExe) / sizeof(wchar_t) - 1] = L'\0';
 
-
 		blog(LOG_INFO, "Python Home: %ls", pythonHome);
 		blog(LOG_INFO, "Python Executable: %ls", pythonExe);
 
