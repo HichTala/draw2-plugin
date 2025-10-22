@@ -6,8 +6,8 @@
 #include "plugin-path.h"
 
 #include <Python.h>
-#include <stdio.h>
-#include <wchar.h>
+#include <cstdio>
+#include <cwchar>
 #ifdef _WIN32
 #include <windows.h>
 #include <tchar.h>
@@ -188,7 +188,6 @@ void DrawDock::initialize_python_interpreter() const
 			return;
 		}
 #ifdef _WIN32
-		QString sitePackagesPath = pyHome + "/Lib/site-packages";
 		QByteArray pyExe = pyHome + "/python.exe";
 #else
 		QString pythonVersion;
@@ -231,9 +230,14 @@ void DrawDock::initialize_python_interpreter() const
 		PyConfig_InitPythonConfig(&config);
 		PyConfig_SetString(&config, &config.executable, pythonExe);
 		PyConfig_SetString(&config, &config.home, pythonHome);
+		config.dev_mode = 1;
+		config.parse_argv = 0;
 
 #ifndef _WIN32
 		PyConfig_SetString(&config, &config.pythonpath_env, pythonPath);
+#else
+		_putenv("PYTHONVERBOSE=1");
+		_putenv("PYTHONDEBUG=1");
 #endif
 		PyStatus status = Py_InitializeFromConfig(&config);
 		if (PyStatus_Exception(status) || !Py_IsInitialized()) {
