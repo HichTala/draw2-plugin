@@ -233,12 +233,15 @@ void DrawDock::initialize_python_interpreter() const
 		PyConfig_SetString(&config, &config.home, pythonHome);
 
 		putenv(("PYTHONHOME=" + std::string(pyHome)).data());
-		putenv(("PYTHONPATH=" + std::string(pyHome) + "/python312.zip;" + std::string(pyHome) + "/Lib/site-packages;" + std::string(pyHome)).data());
+		putenv(("PYTHONPATH=" + std::string(pyHome) + "/python312.zip;" + std::string(pyHome) +
+			"/Lib/site-packages;" + std::string(pyHome))
+			       .data());
 
-		const char* pyhome_env = getenv("PYTHONHOME");
-		const char* pypath_env = getenv("PYTHONPATH");
-		const char* lang = getenv("LANG");
-		blog(LOG_INFO, "PYTHONHOME env: %s, PYTHONPATH env: %s, LANG: %s", pyhome_env ? pyhome_env : "(null)", pypath_env ? pypath_env : "(null)", lang ? lang : "(null)");
+		const char *pyhome_env = getenv("PYTHONHOME");
+		const char *pypath_env = getenv("PYTHONPATH");
+		const char *lang = getenv("LANG");
+		blog(LOG_INFO, "PYTHONHOME env: %s, PYTHONPATH env: %s, LANG: %s", pyhome_env ? pyhome_env : "(null)",
+		     pypath_env ? pypath_env : "(null)", lang ? lang : "(null)");
 
 #ifndef _WIN32
 		PyConfig_SetString(&config, &config.pythonpath_env, pythonPath);
