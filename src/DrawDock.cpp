@@ -228,28 +228,24 @@ void DrawDock::initialize_python_interpreter() const
 
 		PyConfig config;
 		PyConfig_InitPythonConfig(&config);
+		config.isolated = 1;
+
 		PyConfig_SetString(&config, &config.executable, pythonExe);
 		PyConfig_SetString(&config, &config.home, pythonHome);
-
-		// print config values you will pass
-		blog(LOG_INFO, "Python Home (wchar): %ls", pythonHome);
-		blog(LOG_INFO, "Python Executable (wchar): %ls", pythonExe);
-
-		// also print env vars (POSIX example)
-		const char* pyhome_env = getenv("PYTHONHOME");
-		const char* pypath_env = getenv("PYTHONPATH");
-		const char* lang = getenv("LANG");
-		blog(LOG_INFO, "PYTHONHOME env: %s, PYTHONPATH env: %s, LANG: %s", pyhome_env ? pyhome_env : "(null)", pypath_env ? pypath_env : "(null)", lang ? lang : "(null)");
-
 
 #ifndef _WIN32
 		PyConfig_SetString(&config, &config.pythonpath_env, pythonPath);
 #endif
 		PyStatus status = Py_InitializeFromConfig(&config);
 		if (PyStatus_Exception(status) || !Py_IsInitialized()) {
+
 			blog(LOG_INFO, "Failed to initialize Python interpreter: %s", status.err_msg);
 			PyConfig_Clear(&config);
-			return;
+			if (PyStatus_IsExit(status)) {
+				blog(LOG_INFO, "Failed to initialize Python interpreter: %d", status.exitcode);
+			}
+			Py_ExitStatusException(status);
+			// return;
 		}
 
 		PyConfig_Clear(&config);
