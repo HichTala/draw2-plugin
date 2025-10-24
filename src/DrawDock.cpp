@@ -146,8 +146,8 @@ void DrawDock::StartPythonDraw()
 	});
 	std::thread([this]() {
 		for (int i = 0; i < 1000; ++i) {
-			blog(LOG_INFO, "Spam");
 			if (this->model_ready.load()) {
+				blog(LOG_INFO, "Spam");
 				this->start_button->setEnabled(true);
 				this->start_button->setText("Stop Draw");
 				blog(LOG_INFO, "Draw2 python backend started successfully");
