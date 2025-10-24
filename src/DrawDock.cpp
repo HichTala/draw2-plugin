@@ -269,11 +269,11 @@ void DrawDock::initialize_python_interpreter() const
 	}
 
 	if (Py_IsInitialized()) {
-		PyObject *pModule = PyImport_ImportModule("draw");
-		if (!pModule) {
-			blog(LOG_ERROR, "Failed to import draw_module.");
-			return;
-		}
+		// PyObject *pModule = PyImport_ImportModule("draw");
+		// if (!pModule) {
+		// 	blog(LOG_ERROR, "Failed to import draw_module.");
+		// 	return;
+		// }
 		blog(LOG_INFO, "Python interpreter initialized successfully");
 		this->start_button->setEnabled(true);
 	} else {
