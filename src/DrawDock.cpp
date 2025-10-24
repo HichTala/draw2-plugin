@@ -93,8 +93,10 @@ void DrawDock::StartPythonDraw()
 		PyObject *pModule = PyImport_ImportModule("draw");
 
 		if (pModule) {
+			blog(LOG_INFO, "draw module imported successfully");
 			PyObject *pFunc = PyObject_GetAttrString(pModule, "run");
 			if (pFunc && PyCallable_Check(pFunc)) {
+				blog(LOG_INFO, "Running python thread");
 				PyObject *args = PyTuple_New(6);
 				PyObject *capsule_stop = PyCapsule_New(&this->should_run, "stop_flag", nullptr);
 				PyTuple_SetItem(args, 0, capsule_stop);
@@ -152,6 +154,7 @@ void DrawDock::StartPythonDraw()
 			}
 			std::this_thread::sleep_for(std::chrono::milliseconds(100));
 		}
+		blog(LOG_INFO, "Draw2 python backend failed to start in time");
 		if (!this->start_button->isEnabled()) {
 			this->start_button->setDisabled(true);
 			this->start_button->setText("Start Draw");
