@@ -91,6 +91,7 @@ void DrawDock::StartPythonDraw()
 		blog(LOG_INFO, "Starting Draw2 python backend");
 
 		PyObject *pModule = PyImport_ImportModule("draw");
+		blog(LOG_INFO, "draw module imported successfully");
 
 		if (pModule) {
 			blog(LOG_INFO, "draw module imported successfully");
