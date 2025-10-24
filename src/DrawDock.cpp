@@ -84,6 +84,8 @@ void DrawDock::StartPythonDraw()
 	this->should_run.store(true);
 	this->model_ready.store(false);
 
+	blog(LOG_INFO, "Starting python thread for Draw2 backend");
+
 	this->python_thread = std::thread([this]() {
 		PyGILState_STATE gstate = PyGILState_Ensure();
 		blog(LOG_INFO, "Starting Draw2 python backend");
@@ -140,7 +142,8 @@ void DrawDock::StartPythonDraw()
 		this->running_flag.store(false);
 	});
 	std::thread([this]() {
-		for (int i = 0; i < 300; ++i) {
+		for (int i = 0; i < 1000; ++i) {
+			blog(LOG_INFO, "Spam");
 			if (this->model_ready.load()) {
 				this->start_button->setEnabled(true);
 				this->start_button->setText("Stop Draw");
