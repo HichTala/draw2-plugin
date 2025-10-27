@@ -280,7 +280,7 @@ void DrawDock::initialize_python_interpreter() const
 			blog(LOG_ERROR, "Failed to import draw module; printing Python error:");
 			PyErr_Print(); // send full Python traceback to stderr
 
-			// Try to locate where Python would load 'draw' from
+			blog(LOG_ERROR, "Try to locate where Python would load 'draw' from");
 			PyObject *importlib_util = PyImport_ImportModule("importlib.util");
 			if (importlib_util) {
 				PyObject *find_spec = PyObject_GetAttrString(importlib_util, "find_spec");
