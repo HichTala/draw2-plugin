@@ -245,7 +245,7 @@ void DrawDock::initialize_python_interpreter() const
 		PyConfig_SetString(&config, &config.executable, pythonExe);
 		PyConfig_SetString(&config, &config.home, pythonHome);
 
-		putenv(("PYTHONHOME=" + std::string(pyHome)).data());
+		// putenv(("PYTHONHOME=" + std::string(pyHome)).data());
 		putenv(("PYTHONPATH=" + std::string(pyHome) + "/python312.zip;" + std::string(pyHome) +
 			"/Lib/site-packages;" + std::string(pyHome))
 			       .data());
