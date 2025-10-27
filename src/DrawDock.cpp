@@ -280,7 +280,10 @@ void DrawDock::initialize_python_interpreter() const
 			blog(LOG_ERROR, "Failed to import draw_module.");
 			return;
 		}
+		Py_XDECREF(pModule);
 		blog(LOG_INFO, "Python interpreter initialized successfully");
+		// Release the GIL so std::thread workers can acquire it with PyGILState_Ensure()
+		PyEval_SaveThread();
 		this->start_button->setEnabled(true);
 	} else {
 		blog(LOG_INFO, "Failed to initialize Python interpreter");
