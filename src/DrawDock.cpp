@@ -84,13 +84,14 @@ void DrawDock::StartPythonDraw()
 	this->should_run.store(true);
 	this->model_ready.store(false);
 
-	blog(LOG_INFO, "Starting python thread for Draw2 backend");
+	blog(LOG_INFO, "Starting python Draw2");
 	if (Py_IsInitialized()) {
 		blog(LOG_INFO, "Python interpreter is initialized.");
 	} else {
 		blog(LOG_INFO, "Python interpreter is not initialized. Initializing now...");
 		initialize_python_interpreter();
 	}
+	blog(LOG_INFO, "after Pyinitialized");
 
 	// this->python_thread = std::thread([this]() {
 	// std::thread t([this]() {
