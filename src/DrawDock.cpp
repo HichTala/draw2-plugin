@@ -328,7 +328,7 @@ void DrawDock::initialize_python_interpreter() const
 			Py_XDECREF(sys);
 		}
 
-		PyObject *pModule = PyImport_ImportModule("cv2");
+		PyObject *pModule = PyImport_ImportModule("draw");
 		if (!pModule) {
 			blog(LOG_ERROR, "Failed to import draw module; printing Python error:");
 
