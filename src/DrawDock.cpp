@@ -275,10 +275,15 @@ void DrawDock::initialize_python_interpreter() const
 	}
 
 	if (Py_IsInitialized()) {
-		PyRun_SimpleString(R"(
-import sys
-sys.path = ['C:\\Program Files\\draw2\\python\\python312.zip', 'C:\\Program Files\\draw2\\python\\Lib\\site-packages', 'C:\\Program Files\\draw2\\python', 'C:\\Program Files\\draw2\\python\\Lib', 'C:\\Program Files\\obs-studio\\bin\\64bit']
-)");
+		PyRun_SimpleString(
+"import sys, os\n"
+"print('Python OK')\n"
+"print('sys.version =', sys.version)\n"
+"print('sys.executable =', sys.executable)\n"
+"print('sys.path =', sys.path)\n"
+"print('os.__file__ =', os.__file__)\n"
+);
+
 
 
 		PyObject *sys = PyImport_ImportModule("sys");
@@ -296,7 +301,7 @@ sys.path = ['C:\\Program Files\\draw2\\python\\python312.zip', 'C:\\Program File
 			Py_XDECREF(sys);
 		}
 
-		PyObject *pModule = PyImport_ImportModule("cv2");
+		PyObject *pModule = PyImport_ImportModule("torch");
 		if (!pModule) {
 			blog(LOG_ERROR, "Failed to import draw module; printing Python error:");
 
