@@ -11,6 +11,7 @@
 #ifdef _WIN32
 #include <windows.h>
 #include <tchar.h>
+#include <Psapi.h>
 #endif
 
 #include "DrawDock.hpp"
@@ -20,6 +21,26 @@
 #include <QSettings>
 #include <QStandardPaths>
 #include <obs-module.h>
+
+#include <iostream>
+
+#ifdef _WIN32
+void log_loaded_dlls() {
+	HMODULE hMods[1024];
+	Qt::HANDLE hProcess = GetCurrentProcess();
+	DWORD cbNeeded;
+	if (EnumProcessModules(hProcess, hMods, sizeof(hMods), &cbNeeded)) {
+		for (unsigned int i = 0; i < (cbNeeded / sizeof(HMODULE)); i++) {
+			TCHAR szModName[MAX_PATH];
+			if (GetModuleFileNameEx(hProcess, hMods[i], szModName, sizeof(szModName) / sizeof(TCHAR))) {
+				if (_tcsstr(szModName, L"mf") || _tcsstr(szModName, L"d3d") || _tcsstr(szModName, L"dxgi"))
+					blog(LOG_INFO, "Preloaded: %ls", szModName);
+			}
+		}
+	}
+}
+#endif
+
 
 DrawDock::DrawDock(QWidget *parent) : QWidget(parent)
 {
@@ -258,7 +279,10 @@ void DrawDock::initialize_python_interpreter() const
 
 #ifndef _WIN32
 		PyConfig_SetString(&config, &config.pythonpath_env, pythonPath);
+#else
+		log_loaded_dlls()
 #endif
+
 		PyStatus status = Py_InitializeFromConfig(&config);
 		if (PyStatus_Exception(status) || !Py_IsInitialized()) {
 
