@@ -1,7 +1,6 @@
 <div align="center">
     <p>
-        👀
-        <!img src="">
+        <img src="https://raw.githubusercontent.com/HichTala/draw2/refs/heads/main/figures/banner-draw.png">
     </p>
 
 
@@ -30,7 +29,7 @@ detector directly into their live streams or recorded videos; and those **withou
 The plugin can display detected cards in real time for an enhanced viewing experience. 
 The python backend project is available [here](https://github.com/HichTala/draw2).
 
-This project is licensed under the [GNU Affero General Public License v3.0.](LICENCE); all contributions are welcome.
+This project is licensed under the [GNU Affero General Public License v3.0](LICENCE); all contributions are welcome.
 
 ---
 ## <div align="center">📄Documentation</div>
