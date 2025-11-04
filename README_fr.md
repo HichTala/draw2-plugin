@@ -61,8 +61,8 @@ correctement :
    téléchargement des poids du modèle.
    Lorsque vous voyez
    ```bash
-    Exécution de Draw2 sans mémoire partagée OBS
-    En attente du démarrage d'OBS...
+    Running Draw2 without OBS shared memory
+    Waiting for OBS to start...
    ```
    le téléchargement est terminé, vous pouvez relancer OBS Studio.
 
