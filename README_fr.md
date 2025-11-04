@@ -127,7 +127,7 @@ Si vous avez des questions, n'hésitez pas à ouvrir une issue.
 
 ## <div align="center">💬Contact</div>
 
-Vous pouvez me joindre sur Twitter [@tiazden](https://twitter.com/tiazden) ou par
+Vous pouvez me joindre sur Twitter [@hichtala](https://twitter.com/hichtala) ou par
 mail [hich.tala.phd@gmail.com](mailto:hich.tala.phd@gmail.com).
 
 ---
