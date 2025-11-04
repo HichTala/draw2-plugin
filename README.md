@@ -43,7 +43,7 @@ Follow the installation instruction depending on your operating system so everyt
 <summary>🪟 Windows</summary>
 
 1. Download the plugin installer from this
-   link: [DRAW2 OBS Plugin Installer](https://github.com/HichTala/draw2-obsplugin/releases/download/0.1.0/draw2-obs-plugin-installer.exe)
+   link: [DRAW2 OBS Plugin Installer](https://github.com/HichTala/draw2-obsplugin/releases/download/0.1.1/draw2-obs-plugin-installer.exe)
 2. Run the installer and follow the on-screen instructions.
 3. Once the installation is complete, launch OBS Studio. If everything is set up correctly, you should see in the
    `Docks` menu
