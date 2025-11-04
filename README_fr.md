@@ -65,13 +65,15 @@ correctement :
     En attente du démarrage d'OBS...
    ```
    le téléchargement est terminé, vous pouvez relancer OBS Studio.
-<\details>
+
+</details>
 
 <details>
 <summary>🐧 Linux</summary>
 
 À venir 👀
-<\details>
+
+</details>
 
 <details>
 <summary>🍏 MacOS</summary>
@@ -80,7 +82,7 @@ Je ne connais pas suffisamment bien OBS sur macOS pour fournir un guide d'instal
 Le plugin peut être compilé avec succès sur macOS, mais je ne l'ai pas testé de manière approfondie.
 Si vous avez de l'expérience avec les plugins OBS sur macOS et que vous souhaitez contribuer à un guide d'installation,
 n'hésitez pas à soumettre une demande d'extraction.
-<\details>
+</details>
 
 ### 🚀 Utilisation
 
@@ -111,10 +113,13 @@ Une fois le plugin installé et les poids du modèle téléchargés, vous pouvez
 5. Dans le cas contraire, vous pouvez profiter du plugin !
 
 ---
+
 ## <div align="center">🔍Aperçu de la méthode</div>
 
 Un blog medium expliquant le processus principal, de la collecte des données à la prédiction finale a été publié.
-Vous pouvez le retrouver [ici](https://medium.com/@hich.tala.phd/how-i-trained-again-my-model-to-detect-and-recognise-a-wide-range-of-yu-gi-oh-cards-5c567a320b0a). Si vous avez des questions, n'hésitez pas à ouvrir une issue.
+Vous pouvez le retrouver
+[ici](https://medium.com/@hich.tala.phd/how-i-trained-again-my-model-to-detect-and-recognise-a-wide-range-of-yu-gi-oh-cards-5c567a320b0a).
+Si vous avez des questions, n'hésitez pas à ouvrir une issue.
 
 [![Medium](https://img.shields.io/badge/-Medium-12100E?style=flat&logo=medium&labelColor=555)](https://medium.com/@hich.tala.phd/how-i-trained-again-my-model-to-detect-and-recognise-a-wide-range-of-yu-gi-oh-cards-5c567a320b0a)
 
