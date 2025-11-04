@@ -57,7 +57,7 @@ correctement :
    ```bash
    ./python.exe -c "import draw;draw.run()"
    ```
-6. À cette étape, vous devriez voir apparaître des journaux, notamment des barres de progression indiquant le
+6. À cette étape, vous devriez voir s’afficher des logs dans la console, notamment des barres de progression indiquant le
    téléchargement des poids du modèle.
    Lorsque vous voyez
    ```bash
