@@ -112,6 +112,11 @@ Une fois le plugin installé et les poids du modèle téléchargés, vous pouvez
    Si vous ne le voyez pas, cela signifie qu'il y a eu un problème.
 5. Dans le cas contraire, vous pouvez profiter du plugin !
 
+Voici un petit aperçu :)
+<div align="center">
+    <img src="https://raw.githubusercontent.com/HichTala/draw2/refs/heads/main/figures/overview.gif" width="960" height="540" />
+</div>
+
 ---
 
 ## <div align="center">🔍Aperçu de la méthode</div>
