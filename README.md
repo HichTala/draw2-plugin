@@ -101,6 +101,11 @@ When the plugin is installed and the model weights are downloaded, you can launc
    `Stop DRAW` button. If you don't see it something went wrong.
 5. In the other case you can enjoy the plugin!
 
+Here is a small overview :)
+<div align="center">
+    <img src="https://raw.githubusercontent.com/HichTala/draw2/refs/heads/main/figures/overview.gif" width="960" height="540" />
+</div>
+
 ---
 ## <div align="center">🔍Method Overview</div>
 
