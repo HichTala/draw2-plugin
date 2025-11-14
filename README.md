@@ -6,10 +6,10 @@
 
 <div>
 
-[![DRAW2 Workflow](https://github.com/HichTala/draw2-obsplugin/actions/workflows/push.yaml/badge.svg)](https://github.com/HichTala/draw2-obsplugin/actions/workflows/push.yaml)
+[![DRAW2 Workflow](https://github.com/HichTala/draw2-plugin/actions/workflows/push.yaml/badge.svg)](https://github.com/HichTala/draw2-plugin/actions/workflows/push.yaml)
 [![Licence](https://img.shields.io/pypi/l/ultralytics)](LICENSE)
 [![Github](https://img.shields.io/badge/-github-181717?logo=github&labelColor=555)](https://github.com/HichTala/draw2)
-[![Twitter](https://badgen.net/badge/icon/twitter?icon=twitter&label)](https://twitter.com/hichtala)
+[![Twitter](https://img.shields.io/badge/-twitter-000?logo=x&labelColor=555)](https://twitter.com/hichtala)
 [![HuggingFace Downloads](https://img.shields.io/badge/dynamic/json?url=https%3A%2F%2Fhuggingface.co%2Fapi%2Fmodels%2FHichTala%2Fdraw2&query=%24.downloads&logo=huggingface&label=downloads&color=%23FFD21E)](https://huggingface.co/HichTala/draw2)
 [![Medium](https://img.shields.io/badge/-Medium-12100E?style=flat&logo=medium&labelColor=555)](https://medium.com/@hich.tala.phd/how-i-trained-again-my-model-to-detect-and-recognise-a-wide-range-of-yu-gi-oh-cards-5c567a320b0a)
 [![WandB](https://img.shields.io/badge/visualize_in-W%26B-yellow?logo=weightsandbiases&color=%23FFBE00)](https://wandb.ai/hich_/draw)
@@ -24,7 +24,7 @@
 DRAW 2 (which stands for **D**etect and **R**ecognize **A** **W**ide range of cards version 2) is an object detector
 trained to detect _Yu-Gi-Oh!_ cards in all types of images, and in particular in dueling images.
 
-This project is the OBS plugin part of the DRAW 2 system. It allows users to seamlessly integrate the
+This project is the plugin part of the DRAW 2 system. It allows users to seamlessly integrate the
 detector directly into their live streams or recorded videos; and those **without any particular technical skills**.
 The plugin can display detected cards in real time for an enhanced viewing experience.
 The python backend project is available [here](https://github.com/HichTala/draw2).
@@ -43,7 +43,7 @@ Follow the installation instruction depending on your operating system so everyt
 <summary>🪟 Windows</summary>
 
 1. Download the plugin installer from this
-   link: [DRAW2 OBS Plugin Installer](https://github.com/HichTala/draw2-obsplugin/releases/download/0.1.1/draw2-obs-plugin-installer.exe)
+   link: [DRAW2 Plugin Installer](https://github.com/HichTala/draw2-plugin/releases/download/0.1.1/draw2-plugin-installer.exe)
 2. Run the installer and follow the on-screen instructions.
 3. Once the installation is complete, launch OBS Studio. If everything is set up correctly, you should see in the
    `Docks` menu
