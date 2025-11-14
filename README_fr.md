@@ -44,7 +44,7 @@ correctement :
 <summary>🪟 Windows</summary>
 
 1. Téléchargez le programme d'installation du plugin à partir de ce
-   lien : [DRAW2 Plugin Installer](https://github.com/HichTala/draw2-plugin/releases/download/0.1.2/draw2-plugin-installer.exe)
+   lien : [DRAW2 Plugin Installer](https://github.com/HichTala/draw2-plugin/releases/download/0.1.3/draw2-plugin-installer.exe)
 2. Exécutez le programme d'installation et suivez les instructions à l'écran.
 3. Une fois l'installation terminée, lancez OBS Studio. Si tout est correctement configuré, vous devriez voir dans le
    menu `Docks`
