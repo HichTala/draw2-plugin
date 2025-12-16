@@ -101,20 +101,15 @@ void draw_source_video_render(void *data, gs_effect_t *effect)
 	gs_texrender_end(render);
 
 	gs_texture_t *texture = gs_texrender_get_texture(render);
-	blog(LOG_INFO, "is texture ?");
 	if (texture) {
-		blog(LOG_INFO, "texture ok");
 		gs_stagesurf_t *stage = gs_stagesurface_create(width, height, GS_RGBA);
 		gs_stage_texture(stage, texture);
 		if (stage) {
-			blog(LOG_INFO, "stage ok");
 			uint8_t *frame = NULL;
 			uint32_t linesize = 0;
 
 			if (gs_stagesurface_map(stage, &frame, &linesize)) {
-				blog(LOG_INFO, "surface map ok");
 				if (context->shared_frame) {
-					blog(LOG_INFO, "shared frame ok");
 					write_message_to_shared_memory(context, frame, linesize, width, height);
 				}
 				gs_stagesurface_unmap(stage);
