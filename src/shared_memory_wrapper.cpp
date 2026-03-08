@@ -31,7 +31,7 @@ extern "C" void write_message_to_shared_memory(draw_source_data_t *context, uint
 
 	header->width = width;
 	header->height = height;
-	blog(LOG_INFO, "writing frame to shared memory, width: %u, height: %u, linesize: %u", width, height, linesize);
+	blog(LOG_INFO, "writing frame to shared memory, width: %u, height: %u, linesize: %u", header->width, header->height, linesize);
 
 	uint8_t *frame_data = static_cast<uint8_t *>(context->shared_frame) + sizeof(shared_frame_header_t);
 
