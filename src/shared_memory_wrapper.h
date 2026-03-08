@@ -16,7 +16,7 @@ void write_message_to_shared_memory(draw_source_data_t *context, uint8_t *frame,
 void init_shared_memory(draw_source_data_t *context);
 void destroy_shared_memory(draw_source_data_t *context);
 bool read_shared_memory(draw_source_data_t *context);
-void ensure_shared_memory_exists(draw_source_data_t *context);
+void ensure_shared_memory_exists(draw_source_data_t *context, uint32_t width, uint32_t height);
 
 #ifdef __cplusplus
 }

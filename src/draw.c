@@ -10,7 +10,7 @@
 const char *draw_source_get_name(void *type_data)
 {
 	UNUSED_PARAMETER(type_data);
-	return obs_module_text(obs_module_text("draw_display"));
+	return obs_module_text("draw_display");
 }
 
 void *draw_source_create(obs_data_t *settings, obs_source_t *source)
@@ -26,6 +26,8 @@ void *draw_source_create(obs_data_t *settings, obs_source_t *source)
 void draw_source_destroy(void *data)
 {
 	draw_source_data_t *context = data;
+	if (!context->source)
+		return;
 
 	obs_source_t *source = obs_weak_source_get_source(context->source);
 	if (source) {
@@ -47,14 +49,14 @@ uint32_t draw_source_get_height(void *data)
 {
 	draw_source_data_t *context = data;
 	if (!context->display_height)
-		return 391;
+		return 1195;
 	return context->display_height;
 }
 uint32_t draw_source_get_width(void *data)
 {
 	draw_source_data_t *context = data;
 	if (!context->display_width)
-		return 268;
+		return 813;
 	return context->display_width;
 }
 
@@ -79,8 +81,14 @@ void draw_source_video_render(void *data, gs_effect_t *effect)
 		return;
 	}
 
-	uint32_t width = context->source_width;
-	uint32_t height = context->source_height;
+	uint32_t width = obs_source_get_width(source);
+	uint32_t height = obs_source_get_height(source);
+
+	if (width == 0 || height == 0) {
+		obs_source_release(source);
+		context->processing = false;
+		return;
+	}
 
 	gs_texrender_t *render = gs_texrender_create(GS_RGBA, GS_ZS_NONE);
 	if (!gs_texrender_begin(render, width, height)) {
@@ -90,7 +98,7 @@ void draw_source_video_render(void *data, gs_effect_t *effect)
 		return;
 	}
 
-	ensure_shared_memory_exists(context);
+	ensure_shared_memory_exists(context, width, height);
 
 	struct vec4 clear_color;
 	vec4_set(&clear_color, 0.0f, 0.0f, 0.0f, 1.0f); // black
@@ -125,6 +133,7 @@ void draw_source_video_render(void *data, gs_effect_t *effect)
 	obs_source_release(source);
 
 	if (!read_shared_memory(context)) {
+		context->processing = false;
 		return;
 	}
 

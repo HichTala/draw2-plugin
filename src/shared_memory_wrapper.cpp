@@ -88,9 +88,19 @@ extern "C" bool read_shared_memory(draw_source_data_t *context)
 	return true;
 }
 
-extern "C" void ensure_shared_memory_exists(draw_source_data_t *context)
+extern "C" void ensure_shared_memory_exists(draw_source_data_t *context, uint32_t width, uint32_t height)
 {
 	using namespace boost::interprocess;
+
+	if (width != context->source_width || height != context->source_height) {
+		context->source_width = width;
+		context->source_height = height;
+
+		shared_memory_object::remove(OBS_SHM_NAME);
+		init_shared_memory(context);
+		return;
+	}
+
 	try {
 		shared_memory_object shm(open_only, OBS_SHM_NAME, read_only);
 	} catch (const interprocess_exception &ex) {
