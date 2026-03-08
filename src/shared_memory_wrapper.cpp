@@ -34,6 +34,7 @@ extern "C" void write_message_to_shared_memory(draw_source_data_t *context, uint
 	blog(LOG_INFO, "writing frame to shared memory, width: %u, height: %u, linesize: %u", header->width, header->height, linesize);
 
 	uint8_t *frame_data = static_cast<uint8_t *>(context->shared_frame) + sizeof(shared_frame_header_t);
+	blog(LOG_INFO, "sizeof(shared_frame_header_t) = %zu", sizeof(shared_frame_header_t));
 
 	for (uint32_t y = 0; y < height; y++) {
 		memcpy(frame_data + size_t(y) * width * 4, frame + size_t(y) * linesize, size_t(width) * 4);
