@@ -96,7 +96,7 @@ extern "C" void ensure_shared_memory_exists(draw_source_data_t *context, uint32_
 		context->source_width = width;
 		context->source_height = height;
 
-		shared_memory_object::remove(OBS_SHM_NAME);
+		destroy_shared_memory(context);
 		init_shared_memory(context);
 		return;
 	}

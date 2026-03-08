@@ -26,14 +26,14 @@ void *draw_source_create(obs_data_t *settings, obs_source_t *source)
 void draw_source_destroy(void *data)
 {
 	draw_source_data_t *context = data;
-	if (!context->source)
-		return;
-
-	obs_source_t *source = obs_weak_source_get_source(context->source);
-	if (source) {
-		obs_source_release(source);
+	if (context->source) {
+		obs_source_t *source = obs_weak_source_get_source(context->source);
+		if (source) {
+			obs_source_release(source);
+		}
+		obs_weak_source_release(context->source);
 	}
-	obs_weak_source_release(context->source);
+
 	if (context->render) {
 		obs_enter_graphics();
 		gs_texrender_destroy(context->render);
