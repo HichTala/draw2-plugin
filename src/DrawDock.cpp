@@ -140,7 +140,7 @@ void DrawDock::StartPythonDraw()
 		this->running_flag.store(false);
 	});
 	std::thread([this]() {
-		for (int i = 0; i < 1000; ++i) {
+		for (int i = 0; i < 10000; ++i) {
 			if (this->model_ready.load()) {
 				this->start_button->setEnabled(true);
 				this->start_button->setText(obs_module_text("stop_draw"));
