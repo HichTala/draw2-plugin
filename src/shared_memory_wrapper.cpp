@@ -54,7 +54,6 @@ extern "C" void init_shared_memory(draw_source_data_t *context)
 
 	size_t pixel_bytes = MAX_FRAME_WIDTH * MAX_FRAME_HEIGHT * BYTES_PER_PIXEL;
 	size_t required_size = sizeof(shared_frame_header_t) + pixel_bytes;
-	blog(LOG_INFO, "Initializing shared memory for draw2 with size %zu", required_size);
 
 	if (context->region) {
 		delete static_cast<mapped_region *>(context->region);
