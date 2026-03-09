@@ -8,6 +8,10 @@
 #define OBS_SHM_NAME "obs_shared_memory"
 #define PYTHON_SHM_NAME "python_shared_memory"
 
+#define MAX_FRAME_WIDTH 3840
+#define MAX_FRAME_HEIGHT 2160
+#define BYTES_PER_PIXEL 4
+
 #include "shared_memory_wrapper.h"
 
 #include <boost/interprocess/shared_memory_object.hpp>
@@ -48,8 +52,9 @@ extern "C" void init_shared_memory(draw_source_data_t *context)
 		return;
 	}
 
-	size_t pixel_bytes = size_t(context->source_width) * size_t(context->source_height) * 4;
+	size_t pixel_bytes = MAX_FRAME_WIDTH * MAX_FRAME_HEIGHT * BYTES_PER_PIXEL;
 	size_t required_size = sizeof(shared_frame_header_t) + pixel_bytes;
+	blog(LOG_INFO, "Initializing shared memory for draw2 with size %zu", required_size);
 
 	if (context->region) {
 		delete static_cast<mapped_region *>(context->region);
