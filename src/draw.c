@@ -5,8 +5,6 @@
 #include "draw.h"
 #include "shared_memory_wrapper.h"
 
-#include <errno.h>
-
 const char *draw_source_get_name(void *type_data)
 {
 	UNUSED_PARAMETER(type_data);
