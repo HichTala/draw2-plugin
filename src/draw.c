@@ -111,8 +111,8 @@ void draw_source_video_render(void *data, gs_effect_t *effect)
 	gs_texture_t *texture = gs_texrender_get_texture(render);
 	if (texture) {
 		gs_stagesurf_t *stage = gs_stagesurface_create(width, height, GS_RGBA);
-		gs_stage_texture(stage, texture);
 		if (stage) {
+			gs_stage_texture(stage, texture);
 			uint8_t *frame = NULL;
 			uint32_t linesize = 0;
 
