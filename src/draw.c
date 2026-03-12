@@ -228,11 +228,13 @@ obs_properties_t *draw_source_get_properties(void *data)
 
 void switch_source(draw_source_data_t *context, obs_source_t *source)
 {
-	obs_source_t *prev_source = obs_weak_source_get_source(context->source);
-	if (prev_source) {
-		obs_source_release(prev_source);
+	if (context->source) {
+		obs_source_t *prev_source = obs_weak_source_get_source(context->source);
+		if (prev_source) {
+			obs_source_release(prev_source);
+		}
+		obs_weak_source_release(context->source);
 	}
-	obs_weak_source_release(context->source);
 	context->source = obs_source_get_weak_source(source);
 }
 void draw_source_update(void *data, obs_data_t *settings)
