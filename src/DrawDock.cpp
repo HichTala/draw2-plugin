@@ -168,7 +168,7 @@ void DrawDock::StopPythonDraw()
 	}
 }
 
-void DrawDock::initialize_python_interpreter() const
+void DrawDock::initialize_python_interpreter()
 {
 	blog(LOG_INFO, "Initializing Python interpreter ");
 
