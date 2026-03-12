@@ -2,6 +2,9 @@
 // Created by HichTala on 24/06/25.
 //
 
+#define DEFAULT_DISPLAY_CARD_HEIGHT 1195
+#define DEFAULT_DISPLAY_CARD_WIDTH 813
+
 #include "draw.h"
 #include "shared_memory_wrapper.h"
 
@@ -47,14 +50,14 @@ uint32_t draw_source_get_height(void *data)
 {
 	draw_source_data_t *context = data;
 	if (!context->display_height)
-		return 1195;
+		return DEFAULT_DISPLAY_CARD_HEIGHT;
 	return context->display_height;
 }
 uint32_t draw_source_get_width(void *data)
 {
 	draw_source_data_t *context = data;
 	if (!context->display_width)
-		return 813;
+		return DEFAULT_DISPLAY_CARD_WIDTH;
 	return context->display_width;
 }
 
