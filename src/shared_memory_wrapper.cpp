@@ -122,21 +122,16 @@ extern "C" bool read_shared_memory(draw_source_data_t *context)
 			return false;
 		}
 
-		context->display_width = python_header->width;
-		context->display_height = python_header->height;
-
-		if (
-			!context->display_texture ||
-			context->display_width != python_header->width ||
-			context->display_height != python_header->height
-		) {
+		if (!context->display_texture || context->display_width != python_header->width ||
+		    context->display_height != python_header->height) {
+			context->display_width = python_header->width;
+			context->display_height = python_header->height;
 			if (context->display_texture) {
 				gs_texture_destroy(context->display_texture);
 			}
-			context->display_texture = gs_texture_create(context->display_width, context->display_height, GS_RGBA,
-							     1, nullptr, GS_DYNAMIC);
+			context->display_texture = gs_texture_create(context->display_width, context->display_height,
+								     GS_RGBA, 1, nullptr, GS_DYNAMIC);
 		}
-
 
 		uint8_t *image_data = static_cast<uint8_t *>(region.get_address()) + sizeof(shared_frame_header_t);
 
