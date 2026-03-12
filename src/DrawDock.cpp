@@ -94,7 +94,6 @@ void DrawDock::StartPythonDraw()
 		if (pModule) {
 			PyObject *pFunc = PyObject_GetAttrString(pModule, "run");
 			if (pFunc && PyCallable_Check(pFunc)) {
-				blog(LOG_INFO, "Calling start_draw function in draw module");
 				PyObject *args = PyTuple_New(7);
 				PyObject *capsule_stop = PyCapsule_New(&this->should_run, "stop_flag", nullptr);
 				PyTuple_SetItem(args, 0, capsule_stop);
@@ -130,25 +129,22 @@ void DrawDock::StartPythonDraw()
 				int confidence_value = settings.value("confidence_slider", 5).value<int>();
 				PyTuple_SetItem(args, 6, PyLong_FromLong(confidence_value));
 
-				blog(LOG_INFO, "Arguments prepared, calling start_draw function");
 				PyObject *result = PyObject_CallObject(pFunc, args);
 				if (!result) {
-				    blog(LOG_ERROR, "start_draw raised an exception");
-				    PyErr_Print();
+					blog(LOG_ERROR, "Draw2 python backend raised an exception");
+					PyErr_Print();
 				} else {
-				    Py_DECREF(result);
+					Py_DECREF(result);
 				}
-				Py_DECREF(args);
-				blog(LOG_INFO, "start_draw function returned");
 				Py_DECREF(args);
 
 			} else {
-				blog(LOG_ERROR, "Failed to find or call start_draw function.");
+				blog(LOG_ERROR, "Failed to find or call draw run function.");
 			}
 			Py_XDECREF(pFunc);
 			Py_XDECREF(pModule);
 		} else {
-			blog(LOG_ERROR, "Failed to import draw_module.");
+			blog(LOG_ERROR, "Failed to import draw module.");
 		}
 		PyGILState_Release(gstate);
 		this->running_flag.store(false);
