@@ -21,6 +21,7 @@ struct draw_source_data {
 	uint32_t source_height;
 
 	gs_texrender_t *render;
+	gs_stagesurf_t *stage;
 	gs_texture_t *display_texture;
 	uint32_t display_width;
 	uint32_t display_height;
