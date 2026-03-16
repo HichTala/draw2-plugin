@@ -125,11 +125,13 @@ void draw_source_video_render(void *data, gs_effect_t *effect)
 
 	gs_texture_t *texture = gs_texrender_get_texture(context->render);
 	if (texture) {
-		if (!context->stage || width != context->source_width || height != context->source_height) {
+		if (!context->stage || width != context->stage_width || height != context->stage_height) {
 			obs_enter_graphics();
 			if (context->stage)
 				gs_stagesurface_destroy(context->stage);
 			context->stage = gs_stagesurface_create(width, height, GS_RGBA);
+			context->stage_width = width;
+			context->stage_height = height;
 			obs_leave_graphics();
 		}
 
