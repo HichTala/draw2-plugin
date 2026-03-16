@@ -103,6 +103,9 @@ jobs:
           for file in ${{ github.workspace }}/@(*.exe|*.deb|*.ddeb|*.pkg|*.tar.xz|*.zip); do
             echo "    ${file##*/}: $(sha256sum "${file}" | cut -d " " -f 1)" >> ${{ github.workspace }}/CHECKSUMS.txt
           done
+          
+          curl -L https://github.com/HichTala/draw2/releases/download/embedded-python/python-3.12.9-embed-amd64.zip -o python-3.12.9-embed-amd64.zip 
+          curl -L https://github.com/HichTala/draw2-installer-script/releases/download/1.0.0/draw2-plugin-installer.exe -o draw2-plugin-installer.exe
 
       - name: Create Release 🛫
         if: fromJSON(steps.check.outputs.validTag)
