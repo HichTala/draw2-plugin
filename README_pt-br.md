@@ -70,20 +70,8 @@ Siga a instrução de instalação dependendo do seu sistema operacional para qu
 3. Assim que a instalação estiver concluída, execute o OBS Studio. Se tudo foi configurado corretamente, 
    deve-se ver no menu `Painéis` uma nova opção chamada `Draw 2`. 
    Você pode ativar o painel e colocá-lo onde quiser.
-4. Nessa etapa, a instalação não está completa ainda. Você precisa baixar os "model weights" do DRAW 2.
-   Feche o OBS Studio e abra a pasta onde o plugin está instalado. Por padrão, deve estar em: 
-   `C:\Arquivos de Programas\draw2`. Aqui, abra a pasta `python`, clique com o botão direito em qualquer lugar dentro da pasta e selecione `Abrir no Terminal`.
-5. No terminal, execute o seguinte comando para baixar os "model weights":
-   ```bash
-   ./python.exe -c "import draw;draw.run()"
-   ```
-6. Nessa etapa você deve ver alguns logs incluindo barras de progresso baixando os "model weights".
-   Assim que você vir:
-    ```bash
-    Running Draw2 without OBS shared memory
-    Waiting for OBS to start...
-   ```
-   o download foi concluído e você pode reabrir o OBS Studio.
+
+   O download foi concluído!
 </details>
 
 <details>
