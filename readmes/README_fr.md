@@ -34,7 +34,7 @@ bienvenues.
 ---
 ## <div align="center">📰 News</div>
 
-> 🃏 **Dernière extension supportée:** `MZMU` --- mise à jour le `06-04-2026`  
+> 🃏 **Dernière extension supportée:** `BLZD` --- mise à jour le `18-05-2026`  
 > 🔧 **Dernière version:** `0.2.0-beta` --- mise à jour le `06-04-2026`
 
 <table>
@@ -42,6 +42,11 @@ bienvenues.
     <th>Date</th>
     <th>Type</th>
     <th>Description</th>
+  </tr>
+  <tr>
+    <td><b>18-05-2026</b></td>
+    <td>🃏 Pool de cartes</td>
+    <td>Mise à jour du pool de cartes --- prend désormais en charge les cartes jusqu'à <i>Territoire Embrasé</i></td>
   </tr>
   <tr>
     <td><b>06-04-2026</b></td>
