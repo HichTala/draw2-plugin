@@ -34,7 +34,7 @@ This project is licensed under the [GNU Affero General Public License v3.0](LICE
 ---
 ## <div align="center">📰 News</div>
 
-> 🃏 **Latest card pool:** `MZMU` --- last updated `06-04-20265`  
+> 🃏 **Latest card pool:** `BLZD` --- last updated `18-05-2026`  
 > 🔧 **Latest app version:** `0.2.0-beta` --- last updated `06-04-2026`
 
 <table>
@@ -42,6 +42,11 @@ This project is licensed under the [GNU Affero General Public License v3.0](LICE
     <th>Date</th>
     <th>Type</th>
     <th>Description</th>
+  </tr>
+  <tr>
+    <td><b>18-05-2026</b></td>
+    <td>🃏 Card Pool</td>
+    <td>Card pool updated --- now supports cards up to <i>Blazing Dominion</i></td>
   </tr>
   <tr>
     <td><b>06-04-2026</b></td>
