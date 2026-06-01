@@ -59,7 +59,7 @@ SettingsDialog::SettingsDialog(QWidget *parent) : QDialog(parent)
 	QString deck_list_path1 = settings.value("deck_list1", "").toString();
 	QString deck_list_path2 = settings.value("deck_list2", "").toString();
 	QString deck_list_path3 = settings.value("deck_list3", "").toString();
-	QString model_choice_string = settings.value("model_choice", "Base").toString();
+	int model_choice_int = settings.value("model_choice", 0).toInt();
 	QString python_path_string = settings.value("python_path", "").toString();
 	int minimum_out_of_screen_time_value = settings.value("minimum_out_of_screen_time", 25).value<int>();
 	int minimum_screen_time_value = settings.value("minimum_screen_time", 6).value<int>();
@@ -80,12 +80,9 @@ SettingsDialog::SettingsDialog(QWidget *parent) : QDialog(parent)
 	auto *model_label = new QLabel(obs_module_text("Select model size to use:"), this);
 	model_layout->addWidget(model_label);
 	this->model_choice->setMaximumWidth(125);
-	this->model_choice->addItem(obs_module_text("model_size_large"));
 	this->model_choice->addItem(obs_module_text("model_size_base"));
-	int model_index = this->model_choice->findText(model_choice_string, Qt::MatchExactly);
-	if (model_index != -1) {
-		this->model_choice->setCurrentIndex(model_index);
-	}
+	this->model_choice->addItem(obs_module_text("model_size_large"));
+	this->model_choice->setCurrentIndex(model_choice_int);
 	model_layout->addWidget(this->model_choice);
 	layout->addLayout(model_layout);
 
@@ -191,7 +188,7 @@ void SettingsDialog::OkButtonClicked()
 	settings.setValue("deck_list1", this->deck_list1->currentText());
 	settings.setValue("deck_list2", this->deck_list2->currentText());
 	settings.setValue("deck_list3", this->deck_list3->currentText());
-	settings.setValue("model_choice", this->model_choice->currentText());
+	settings.setValue("model_choice", this->model_choice->currentIndex());
 	settings.setValue("python_path", this->python_path->text());
 	settings.setValue("minimum_screen_time", this->minimum_screen_time->value());
 	settings.setValue("minimum_out_of_screen_time", this->minimum_out_of_screen_time->value());
