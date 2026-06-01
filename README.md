@@ -35,7 +35,7 @@ This project is licensed under the [GNU Affero General Public License v3.0](LICE
 ## <div align="center">📰 News</div>
 
 > 🃏 **Latest card pool:** `BLZD` --- last updated `18-05-2026`  
-> 🔧 **Latest app version:** `0.2.1-beta` --- last updated `06-04-2026`
+> 🔧 **Latest app version:** `0.2.1-beta` --- last updated `01-06-2026`
 
 <table>
   <tr>
@@ -44,7 +44,7 @@ This project is licensed under the [GNU Affero General Public License v3.0](LICE
     <th>Description</th>
   </tr>
   <tr>
-    <td><b>06-04-2026</b></td>
+    <td><b>01-06-2026</b></td>
     <td>🔧 App Update</td>
     <td>Released version 0.2.1-beta --- <a href="https://github.com/HichTala/draw2-plugin/releases/tag/0.2.1">see release notes</a></td>
   </tr>
