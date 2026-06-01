@@ -25,7 +25,7 @@ Pythonバックエンドのプロジェクトは[こちら](https://github.com/H
 ## <div align="center">📰 ニュース</div>
 
 > 🃏 **対応している最新の拡張機能:** `MZMU` --- 最終更新日 `06-04-2026`  
-> 🔧 **最新版:** `0.2.0-beta` --- 最終更新日 `06-04-2026`
+> 🔧 **最新版:** `0.2.1-beta` --- 最終更新日 `01-06-2026`
 
 ---
 
@@ -38,7 +38,7 @@ OSに応じた手順に従ってセットアップしてください。
 <details open>
 <summary>🪟 Windows</summary>
 
-1. プラグインのインストーラーを[こちら](https://github.com/HichTala/draw2-plugin/releases/download/0.2.0/draw2-plugin-installer.exe)からダウンロードします。
+1. プラグインのインストーラーを[こちら](https://github.com/HichTala/draw2-plugin/releases/download/0.2.1/draw2-plugin-installer.exe)からダウンロードします。
 2. インストーラーを実行し、画面の指示に従ってください。
 3. インストールが完了したらOBS Studioを起動します。`Docks` メニューに `Draw 2` が表示されるので、有効化して好きな位置に配置します。
 4. まだインストールは完了していません。DRAW 2のモデルウェイトをダウンロードする必要があります。OBS Studioを閉じ、プラグインがインストールされたフォルダを開きます（デフォルト:`C:\Program Files\draw2`）。`python` フォルダを開き、右クリックして「ターミナルで開く」を選択します。
