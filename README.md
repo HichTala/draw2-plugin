@@ -35,13 +35,18 @@ This project is licensed under the [GNU Affero General Public License v3.0](LICE
 ## <div align="center">📰 News</div>
 
 > 🃏 **Latest card pool:** `BLZD` --- last updated `18-05-2026`  
-> 🔧 **Latest app version:** `0.2.0-beta` --- last updated `06-04-2026`
+> 🔧 **Latest app version:** `0.2.1-beta` --- last updated `06-04-2026`
 
 <table>
   <tr>
     <th>Date</th>
     <th>Type</th>
     <th>Description</th>
+  </tr>
+  <tr>
+    <td><b>06-04-2026</b></td>
+    <td>🔧 App Update</td>
+    <td>Released version 0.2.1-beta --- <a href="https://github.com/HichTala/draw2-plugin/releases/tag/0.2.1">see release notes</a></td>
   </tr>
   <tr>
     <td><b>18-05-2026</b></td>
@@ -82,7 +87,7 @@ Follow the installation instruction depending on your operating system so everyt
 <summary>🪟 Windows</summary>
 
 1. Download the plugin installer from this
-   link: [DRAW2 Plugin Installer](https://github.com/HichTala/draw2-plugin/releases/download/0.2.0/draw2-plugin-installer.exe)
+   link: [DRAW2 Plugin Installer](https://github.com/HichTala/draw2-plugin/releases/download/0.2.1/draw2-plugin-installer.exe)
 2. Run the installer and follow the on-screen instructions.
 3. Once the installation is complete, launch OBS Studio. If everything is set up correctly, you should see in the
    `Docks` menu
