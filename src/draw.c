@@ -70,6 +70,7 @@ uint32_t draw_source_get_width(void *data)
 
 void draw_source_get_defaults(obs_data_t *settings)
 {
+	obs_data_set_default_int(settings, "channel", 1);
 	obs_data_set_default_int(settings, "crop_left", 0);
 	obs_data_set_default_int(settings, "crop_top", 0);
 	obs_data_set_default_int(settings, "crop_right", 0);
@@ -283,6 +284,14 @@ obs_properties_t *draw_source_get_properties(void *data)
 
 	obs_property_list_insert_string(p, 0, "", "");
 
+	// Opt-in: the per-player detector selector only when two-player mode is on.
+	if (draw_feature_enabled(FEATURE_CHANNEL)) {
+		obs_property_t *ch = obs_properties_add_list(props, "channel", obs_module_text("channel"),
+							     OBS_COMBO_TYPE_LIST, OBS_COMBO_FORMAT_INT);
+		obs_property_list_add_int(ch, obs_module_text("player_1"), 1);
+		obs_property_list_add_int(ch, obs_module_text("player_2"), 2);
+	}
+
 	// Crop (pixels removed from each edge) to focus detection on a region.
 	// Opt-in: hidden unless enabled in settings.
 	if (draw_feature_enabled(FEATURE_CROP)) {
@@ -319,6 +328,13 @@ void draw_source_update(void *data, obs_data_t *settings)
 	// Optional features force a neutral value when disabled, so turning a
 	// feature off in settings reverts behaviour even if the source still has
 	// stored values from when it was enabled.
+	int new_channel = draw_feature_enabled(FEATURE_CHANNEL) ? (int)obs_data_get_int(settings, "channel") : 1;
+	if (new_channel != context->channel) {
+		// Channel changed: drop the old shared memory so it is re-created
+		// under the new per-channel name on the next render.
+		destroy_shared_memory(context);
+		context->channel = new_channel;
+	}
 	if (draw_feature_enabled(FEATURE_CROP)) {
 		context->crop_left = (uint32_t)obs_data_get_int(settings, "crop_left");
 		context->crop_top = (uint32_t)obs_data_get_int(settings, "crop_top");

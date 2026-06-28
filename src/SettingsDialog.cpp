@@ -59,6 +59,10 @@ SettingsDialog::SettingsDialog(QWidget *parent) : QDialog(parent)
 	QString deck_list_path1 = settings.value("deck_list1", "").toString();
 	QString deck_list_path2 = settings.value("deck_list2", "").toString();
 	QString deck_list_path3 = settings.value("deck_list3", "").toString();
+	QString deck_list_path1_p2 = settings.value("deck_list1_p2", "").toString();
+	QString deck_list_path2_p2 = settings.value("deck_list2_p2", "").toString();
+	QString deck_list_path3_p2 = settings.value("deck_list3_p2", "").toString();
+	bool feature_channel_value = settings.value("feature_channel", false).toBool();
 	int model_choice_int = settings.value("model_choice", 0).toInt();
 	QString python_path_string = settings.value("python_path", "").toString();
 	int minimum_out_of_screen_time_value = settings.value("minimum_out_of_screen_time", 25).value<int>();
@@ -95,9 +99,11 @@ SettingsDialog::SettingsDialog(QWidget *parent) : QDialog(parent)
 
 	QDir dir(get_decklists_path());
 	QFileInfoList files = dir.entryInfoList(QDir::Files);
-	QComboBox *combos[3] = {this->deck_list1, this->deck_list2, this->deck_list3};
-	QString saved[3] = {deck_list_path1, deck_list_path2, deck_list_path3};
-	for (int i = 0; i < 3; i++) {
+	QComboBox *combos[6] = {this->deck_list1,    this->deck_list2,    this->deck_list3,
+				this->deck_list1_p2, this->deck_list2_p2, this->deck_list3_p2};
+	QString saved[6] = {deck_list_path1,    deck_list_path2,    deck_list_path3,
+			    deck_list_path1_p2, deck_list_path2_p2, deck_list_path3_p2};
+	for (int i = 0; i < 6; i++) {
 		combos[i]->setMaximumWidth(125);
 		combos[i]->addItem(obs_module_text("none"));
 		for (const QFileInfo &file : files)
@@ -107,11 +113,27 @@ SettingsDialog::SettingsDialog(QWidget *parent) : QDialog(parent)
 			combos[i]->setCurrentIndex(idx);
 	}
 
+	auto *p1_label = new QLabel(obs_module_text("player_1"), this);
+	layout->addWidget(p1_label);
 	auto *decklist_layout = new QHBoxLayout();
 	decklist_layout->addWidget(this->deck_list1);
 	decklist_layout->addWidget(this->deck_list2);
 	decklist_layout->addWidget(this->deck_list3);
 	layout->addLayout(decklist_layout);
+
+	// Player 2 deck lists: shown only when two-player mode is enabled (toggle
+	// lives in the Advanced features section below).
+	auto *p2_layout = new QVBoxLayout(this->player2_section);
+	p2_layout->setContentsMargins(0, 0, 0, 0);
+	auto *p2_label = new QLabel(obs_module_text("player_2"), this);
+	p2_layout->addWidget(p2_label);
+	auto *decklist_layout_p2 = new QHBoxLayout();
+	decklist_layout_p2->addWidget(this->deck_list1_p2);
+	decklist_layout_p2->addWidget(this->deck_list2_p2);
+	decklist_layout_p2->addWidget(this->deck_list3_p2);
+	p2_layout->addLayout(decklist_layout_p2);
+	this->player2_section->setVisible(feature_channel_value);
+	layout->addWidget(this->player2_section);
 
 	this->minimum_out_of_screen_time->setValue(minimum_out_of_screen_time_value);
 	auto *minimum_out_of_screen_label = new QLabel(obs_module_text("out_of_screen"), this);
@@ -132,11 +154,13 @@ SettingsDialog::SettingsDialog(QWidget *parent) : QDialog(parent)
 	confidence_layout->addWidget(this->confidence_slider);
 	layout->addLayout(confidence_layout);
 
-	// Opt-in detector-input features (off by default).
+	// Opt-in features (off by default).
 	auto *features_label = new QLabel(obs_module_text("advanced_features"), this);
 	layout->addWidget(features_label);
+	this->feature_channel->setChecked(feature_channel_value);
 	this->feature_crop->setChecked(settings.value("feature_crop", false).toBool());
 	this->feature_debug->setChecked(settings.value("feature_debug", false).toBool());
+	layout->addWidget(this->feature_channel);
 	layout->addWidget(this->feature_crop);
 	layout->addWidget(this->feature_debug);
 
@@ -154,6 +178,7 @@ SettingsDialog::SettingsDialog(QWidget *parent) : QDialog(parent)
 	connect(browse_button, SIGNAL(clicked()), SLOT(BrowseButtonClicked()));
 	connect(ok_button, SIGNAL(clicked()), SLOT(OkButtonClicked()));
 	connect(cancel_button, SIGNAL(clicked()), SLOT(CancelButtonClicked()));
+	connect(this->feature_channel, &QCheckBox::toggled, this->player2_section, &QWidget::setVisible);
 	connect(this->confidence_slider, &QSlider::valueChanged,
 		[confidence_value_label](int value) { confidence_value_label->setText(QString::number(value) + "%"); });
 
@@ -182,6 +207,10 @@ void SettingsDialog::OkButtonClicked()
 	settings.setValue("deck_list1", this->deck_list1->currentText());
 	settings.setValue("deck_list2", this->deck_list2->currentText());
 	settings.setValue("deck_list3", this->deck_list3->currentText());
+	settings.setValue("deck_list1_p2", this->deck_list1_p2->currentText());
+	settings.setValue("deck_list2_p2", this->deck_list2_p2->currentText());
+	settings.setValue("deck_list3_p2", this->deck_list3_p2->currentText());
+	settings.setValue("feature_channel", this->feature_channel->isChecked());
 	settings.setValue("model_choice", this->model_choice->currentIndex());
 	settings.setValue("python_path", this->python_path->text());
 	settings.setValue("minimum_screen_time", this->minimum_screen_time->value());
