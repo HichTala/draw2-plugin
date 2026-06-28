@@ -225,9 +225,31 @@ Cuando el plugin está instalado y los pesos del modelo están descargados, pued
      el lanzamiento exacto del backend (rutas de deck resueltas, canal, umbrales) y cada línea del backend sin
      filtrar, y el log de OBS recibe los detalles de captura (fuente de entrada, dimensiones, recorte).
      Útil cuando la detección no funciona como se espera.
+   - **Enable remote decklist** — carga un deck desde una URL HTTP(S) en lugar de un archivo `.ydk` local; mira la nota debajo de la fuente `Draw Display`.
 3. El plugin proporciona una nueva fuente llamada `Draw Display`. Puedes añadirla a tu escena como cualquier otra
    fuente. Esta fuente mostrará las cartas detectadas en pantalla. Puedes elegir de qué fuente/escena detectar las
    cartas. Con el modo de dos jugadores activado, usa la propiedad **Detector / Player** de la fuente para seleccionar de qué detector leer (**Player 1** o **Player 2**); añade un `Draw Display` por jugador para mostrar ambos a la vez.
+
+   > 💡 El plugin también puede cargar una deck list desde una **URL HTTP(S)** en lugar de un archivo `.ydk` local —
+   > muy útil cuando tu lista de cartas la sirve una API remota o un sistema de gestión de torneos. Está
+   > **desactivada por defecto** — activa **Enable remote decklist** en los ajustes de Draw 2 (*Funciones avanzadas*);
+   > las URLs se configuran luego en una pestaña dedicada **Decklist**.
+   >
+   > Una vez activada, hay dos modos disponibles:
+   > - **Import deck from URL…** (botón en la pestaña **Decklist**) — descarga la URL una sola vez y guarda el resultado
+   >   como un `.ydk` normal en la carpeta de deck lists, así puedes usarlo como un deck de archivo normal.
+   > - **Campo de URL por jugador** — una URL por jugador (Player 1, más Player 2 en modo de dos jugadores). Mientras la
+   >   opción remota está activa, estos reemplazan los selectores de archivo; la URL se descarga en vivo al pulsar Start
+   >   DRAW. Ante cualquier error, ese jugador simplemente empieza sin filtro de deck.
+   >
+   > Formatos de respuesta aceptados del servidor: array JSON de IDs de carta (passcodes); objeto JSON
+   > `{ "main": [...], "extra": [...], "side": [...] }`; texto `.ydk` sin procesar; o texto plano con IDs numéricos.
+   >
+   > Se puede configurar una cabecera de autenticación opcional (nombre + valor, p. ej. `Authorization` /
+   > `Bearer …`) que se envía con cada solicitud.
+   >
+   > ⚠️ Las URLs y el valor de la cabecera se almacenan en texto plano en QSettings, igual que el resto de ajustes
+   > del plugin — evita guardar secretos de larga duración ahí.
 4. Haz clic en el botón `Start DRAW` para iniciar el proceso de detección. El plugin empezará a detectar cartas en
    tiempo real y a mostrarlas en pantalla mediante la fuente `Draw Display`. El plugin comienza a detectar en el
    momento en que ves el botón `Stop DRAW`. Si no lo ves, algo salió mal.

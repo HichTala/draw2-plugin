@@ -222,9 +222,32 @@ When the plugin is installed and the model weights are downloaded, you can launc
      - **Enable debug logging** — surfaces verbose diagnostics: the dock log shows the exact backend launch
        (resolved deck paths, channel, thresholds) and every backend line unfiltered, and the OBS log gets the
        capture details (input source, dimensions, crop). Handy when detection isn't behaving.
+     - **Enable remote decklist** — load a deck from an HTTP(S) URL instead of a local `.ydk` file; see the note
+       below the `Draw Display` source.
 3. The plugin provide a new source called `Draw Display`. You can add it to your scene like any other source.
    This source will display the detected cards on the screen. You can choose what source/scene to detect cards from.
    With two-player mode enabled, use the **Detector / Player** property on the source to pick which detector it reads from (**Player 1** or **Player 2**); add one `Draw Display` per player to show both at once.
+
+   > 💡 The plugin can also load a decklist from an **HTTP(S) URL** instead of a local `.ydk` file — handy when
+   > your deck list is served by a remote API or tournament system. It is **off by default** — enable
+   > **Enable remote decklist** in Draw 2 settings (*Advanced features*); the URLs are then configured in a
+   > dedicated **Decklist** tab.
+   >
+   > Two modes are available once enabled:
+   > - **Import deck from URL…** (button in the Decklist tab) — fetches the URL once and writes the result as a
+   >   normal `.ydk` into the decklists folder, so you can use it as a regular file deck.
+   > - **Per-player URL field** — one URL per player (Player 1, plus Player 2 in two-player mode). While remote
+   >   is on, these replace the file selectors; the URL is fetched live at Start DRAW. On any failure that player
+   >   simply starts with no deck filter.
+   >
+   > Accepted server response formats: JSON array of card IDs (passcodes); JSON object
+   > `{ "main": [...], "extra": [...], "side": [...] }`; raw `.ydk` text; or plain text containing numeric IDs.
+   >
+   > An optional auth header (name + value, e.g. `Authorization` / `Bearer …`) can be configured and is sent
+   > with every request.
+   >
+   > ⚠️ URLs and the header value are stored in plain text in QSettings, like all other plugin settings —
+   > avoid placing long-lived secrets there.
 4. Click the `Start DRAW` button to start the detection process. The plugin will start detecting cards in real time
    and display them on the screen using the `Draw Display` source. The plugin start detecting from the moment you see
    the
