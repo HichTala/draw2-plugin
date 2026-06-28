@@ -132,6 +132,14 @@ SettingsDialog::SettingsDialog(QWidget *parent) : QDialog(parent)
 	confidence_layout->addWidget(this->confidence_slider);
 	layout->addLayout(confidence_layout);
 
+	// Opt-in detector-input features (off by default).
+	auto *features_label = new QLabel(obs_module_text("advanced_features"), this);
+	layout->addWidget(features_label);
+	this->feature_crop->setChecked(settings.value("feature_crop", false).toBool());
+	this->feature_rotate->setChecked(settings.value("feature_rotate", false).toBool());
+	layout->addWidget(this->feature_crop);
+	layout->addWidget(this->feature_rotate);
+
 	this->ok_button->setProperty("class", "QPushButton");
 	this->cancel_button->setProperty("class", "QPushButton");
 
@@ -179,6 +187,8 @@ void SettingsDialog::OkButtonClicked()
 	settings.setValue("minimum_screen_time", this->minimum_screen_time->value());
 	settings.setValue("minimum_out_of_screen_time", this->minimum_out_of_screen_time->value());
 	settings.setValue("confidence_slider", this->confidence_slider->value());
+	settings.setValue("feature_crop", this->feature_crop->isChecked());
+	settings.setValue("feature_rotate", this->feature_rotate->isChecked());
 	this->close();
 }
 

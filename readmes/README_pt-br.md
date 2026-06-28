@@ -208,6 +208,16 @@ Quando o plugin está instalado e os "model weights" estão baixados, você pode
    - **Minimum Screen Time**: O tempo mínimo que uma carta é exibida.
    - **Confidence Threshold**: Definir o nível de confiança mínima para a detecção de uma carta. Detecções abaixo desse limite
      serão ignoradas.
+   - **Advanced features** (desativadas por padrão): dois ajustes opcionais da entrada do detector que afetam
+     apenas o que o detector vê, sem impacto na sua saída ao vivo. Ative aqui e configure os valores na fonte
+     `Draw Display`:
+     - **Enable detector input crop** — adiciona os campos **Crop (Left/Top/Right/Bottom, px)** à fonte, para
+       focar a detecção na região onde as cartas são colocadas.
+     - **Enable 180° input rotation** — adiciona o botão **Rotate input 180°** à fonte, para câmera montada de
+       cabeça para baixo.
+     - Quando qualquer uma das duas está ativada, a fonte também ganha o botão **Preview detector input**:
+       ative-o para que a fonte exiba o quadro recortado/rotacionado que ela envia ao detector (para ajustar
+       o recorte direto no preview da fonte) e desative-o para voltar a exibir as cartas detectadas.
 3. O plugin irá fornecer uma nova fonte chamada `Draw Display`. Você pode adicioná-la a sua cena como qualquer outra fonte.
    Essa fonte irá exibir as cartas detectadas na tela. Você pode escolher de qual fonte/cena detectar as cartas.
 4. Clique no botão `Start DRAW` para começar o processo de detecção. O plugin irá começar a detectar cartas em tempo real

@@ -16,6 +16,23 @@ struct draw_source_data {
 	// plugin<->backend addressing; defaults to 1 (single detector).
 	int channel;
 
+	// Crop applied to the captured input before it is sent to the detector
+	// (pixels removed from each edge). Lets the user focus detection on a
+	// region of the camera without affecting the source elsewhere.
+	uint32_t crop_left;
+	uint32_t crop_top;
+	uint32_t crop_right;
+	uint32_t crop_bottom;
+
+	// Rotate the captured input 180° before sending it to the detector
+	// (useful when the camera is mounted upside down). Detector-only.
+	bool rotate_180;
+
+	// Tuning aid: when true, this source renders the cropped/rotated input it
+	// feeds the detector (instead of the detected-card overlay), so the crop
+	// can be dialed in from the source's own preview. Detection keeps running.
+	bool preview_input;
+
 	obs_weak_source_t *source;
 
 	void *region;

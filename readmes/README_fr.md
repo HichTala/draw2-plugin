@@ -220,6 +220,17 @@ Une fois le plugin installé et les poids du modèle téléchargés, vous pouvez
    - **Durée minimale d'affichage** : durée minimale pendant laquelle une carte est affichée.
    - **Seuil de confidence** : définissez le niveau de confiance minimum pour la détection des cartes. Les détections
      inférieures à ce seuil seront ignorées.
+   - **Advanced features** (désactivées par défaut) : deux réglages optionnels de l'entrée du détecteur qui
+     n'affectent que ce que voit le détecteur, pas votre sortie en direct. Activez-les ici, puis configurez les
+     valeurs sur la source `Draw Display` :
+     - **Enable detector input crop** — ajoute des champs **Crop (Left/Top/Right/Bottom, px)** à la source,
+       pour cibler la zone où les cartes sont posées.
+     - **Enable 180° input rotation** — ajoute un interrupteur **Rotate input 180°** à la source, pour une
+       caméra montée à l'envers.
+     - Lorsque l'une ou l'autre est activée, la source gagne également le bouton **Preview detector input** :
+       activez-le pour que la source affiche l'image recadrée/pivotée qu'elle envoie au détecteur (afin de
+       régler le recadrage directement dans l'aperçu de la source), puis désactivez-le pour revenir à
+       l'affichage des cartes détectées.
 3. Le plugin fournit une nouvelle source appelée `Affichage DRAW`. Vous pouvez l'ajouter à votre scène comme n'importe
    quelle autre source.
    Cette source affichera les cartes détectées à l'écran. Vous pouvez choisir la source/scène à partir de laquelle
