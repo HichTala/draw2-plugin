@@ -136,7 +136,9 @@ SettingsDialog::SettingsDialog(QWidget *parent) : QDialog(parent)
 	auto *features_label = new QLabel(obs_module_text("advanced_features"), this);
 	layout->addWidget(features_label);
 	this->feature_crop->setChecked(settings.value("feature_crop", false).toBool());
+	this->feature_debug->setChecked(settings.value("feature_debug", false).toBool());
 	layout->addWidget(this->feature_crop);
+	layout->addWidget(this->feature_debug);
 
 	this->ok_button->setProperty("class", "QPushButton");
 	this->cancel_button->setProperty("class", "QPushButton");
@@ -186,6 +188,7 @@ void SettingsDialog::OkButtonClicked()
 	settings.setValue("minimum_out_of_screen_time", this->minimum_out_of_screen_time->value());
 	settings.setValue("confidence_slider", this->confidence_slider->value());
 	settings.setValue("feature_crop", this->feature_crop->isChecked());
+	settings.setValue("feature_debug", this->feature_debug->isChecked());
 	this->close();
 }
 

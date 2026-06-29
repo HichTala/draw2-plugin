@@ -218,6 +218,9 @@ When the plugin is installed and the model weights are downloaded, you can launc
      - When enabled, the source also gains a **Preview detector input** toggle: turn it on to make the
        source render the cropped frame it feeds the detector (so you can dial in the crop right in the
        source's preview), then turn it off to go back to showing detected cards.
+   - **Enable debug logging** (off by default): surfaces verbose diagnostics — the dock log shows the exact backend
+     launch (resolved deck paths, channel, thresholds) and every backend line unfiltered, and the OBS log gets the
+     capture details (input source, dimensions, crop/rotation). Handy when detection isn't behaving.
 3. The plugin provide a new source called `Draw Display`. You can add it to your scene like any other source.
    This source will display the detected cards on the screen. You can choose what source/scene to detect cards from.
 4. Click the `Start DRAW` button to start the detection process. The plugin will start detecting cards in real time
