@@ -137,8 +137,10 @@ SettingsDialog::SettingsDialog(QWidget *parent) : QDialog(parent)
 	layout->addWidget(features_label);
 	this->feature_crop->setChecked(settings.value("feature_crop", false).toBool());
 	this->feature_rotate->setChecked(settings.value("feature_rotate", false).toBool());
+	this->feature_debug->setChecked(settings.value("feature_debug", false).toBool());
 	layout->addWidget(this->feature_crop);
 	layout->addWidget(this->feature_rotate);
+	layout->addWidget(this->feature_debug);
 
 	this->ok_button->setProperty("class", "QPushButton");
 	this->cancel_button->setProperty("class", "QPushButton");
@@ -189,6 +191,7 @@ void SettingsDialog::OkButtonClicked()
 	settings.setValue("confidence_slider", this->confidence_slider->value());
 	settings.setValue("feature_crop", this->feature_crop->isChecked());
 	settings.setValue("feature_rotate", this->feature_rotate->isChecked());
+	settings.setValue("feature_debug", this->feature_debug->isChecked());
 	this->close();
 }
 

@@ -36,6 +36,7 @@ private:
 	// Opt-in detector-input features (off by default). See feature_flags.h.
 	QCheckBox *feature_crop = new QCheckBox(obs_module_text("feature_crop"));
 	QCheckBox *feature_rotate = new QCheckBox(obs_module_text("feature_rotate"));
+	QCheckBox *feature_debug = new QCheckBox(obs_module_text("feature_debug"));
 	QPushButton *python_browse_button = new QPushButton(obs_module_text("browse"));
 	QPushButton *browse_button = new QPushButton(obs_module_text("open_folder"));
 	QPushButton *ok_button = new QPushButton(obs_module_text("ok"));
