@@ -148,8 +148,8 @@ Here is a small overview :)
 ---
 ## <div align="center">🔍Method Overview</div>
 
-A medium blog post explainng the main process from data collection to final prediction has been written. 
-You can access it at [this](https://medium.com/@hich.tala.phd/how-i-trained-again-my-model-to-detect-and-recognise-a-wide-range-of-yu-gi-oh-cards-5c567a320b0a) adress. If you have any questions, don't hesitate to open an issue.
+A medium blog post explaining the main process from data collection to final prediction has been written. 
+You can access it at [this](https://medium.com/@hich.tala.phd/how-i-trained-again-my-model-to-detect-and-recognise-a-wide-range-of-yu-gi-oh-cards-5c567a320b0a) address. If you have any questions, don't hesitate to open an issue.
 
 [![Medium](https://img.shields.io/badge/-Medium-12100E?style=flat&logo=medium&labelColor=555)](https://medium.com/@hich.tala.phd/how-i-trained-again-my-model-to-detect-and-recognise-a-wide-range-of-yu-gi-oh-cards-5c567a320b0a)
 
