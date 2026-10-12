@@ -342,6 +342,10 @@ void draw_source_update(void *data, obs_data_t *settings)
 	context->rotate_180 = draw_feature_enabled(FEATURE_ROTATE) && obs_data_get_bool(settings, "rotate_180");
 	context->preview_input = (draw_feature_enabled(FEATURE_CROP) || draw_feature_enabled(FEATURE_ROTATE)) &&
 				 obs_data_get_bool(settings, "preview_input");
+	if (!context->preview_input) {
+		context->display_height = DEFAULT_DISPLAY_CARD_HEIGHT;
+		context->display_width = DEFAULT_DISPLAY_CARD_WIDTH;
+	}
 	const char *source_name = obs_data_get_string(settings, "input_selection");
 	obs_source_t *source = obs_get_source_by_name(source_name);
 	if (source) {
