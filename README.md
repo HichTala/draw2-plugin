@@ -215,10 +215,8 @@ When the plugin is installed and the model weights are downloaded, you can launc
      sees, not your live output. Enable them here, then configure the values on the `Draw Display` source:
      - **Enable detector input crop** — adds **Crop (Left/Top/Right/Bottom, px)** fields to the source, to focus
        detection on the region where cards are placed.
-     - **Enable 180° input rotation** — adds a **Rotate input 180°** toggle to the source, for a camera mounted
-       upside down.
-     - When either is enabled, the source also gains a **Preview detector input** toggle: turn it on to make the
-       source render the cropped/rotated frame it feeds the detector (so you can dial in the crop right in the
+     - When enabled, the source also gains a **Preview detector input** toggle: turn it on to make the
+       source render the cropped frame it feeds the detector (so you can dial in the crop right in the
        source's preview), then turn it off to go back to showing detected cards.
 3. The plugin provide a new source called `Draw Display`. You can add it to your scene like any other source.
    This source will display the detected cards on the screen. You can choose what source/scene to detect cards from.

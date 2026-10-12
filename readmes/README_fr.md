@@ -220,25 +220,23 @@ Une fois le plugin installé et les poids du modèle téléchargés, vous pouvez
    - **Durée minimale d'affichage** : durée minimale pendant laquelle une carte est affichée.
    - **Seuil de confidence** : définissez le niveau de confiance minimum pour la détection des cartes. Les détections
      inférieures à ce seuil seront ignorées.
-   - **Advanced features** (désactivées par défaut) : deux réglages optionnels de l'entrée du détecteur qui
+   - **Fonctionnalités avancées** (désactivées par défaut) : deux réglages optionnels de l'entrée du détecteur qui
      n'affectent que ce que voit le détecteur, pas votre sortie en direct. Activez-les ici, puis configurez les
      valeurs sur la source `Draw Display` :
-     - **Enable detector input crop** — ajoute des champs **Crop (Left/Top/Right/Bottom, px)** à la source,
+     - **Activer le recadrage de l'entrée du détecteur** — ajoute des champs **Rogner (Gauche/Haut/Droite/Bas, px)** à la source,
        pour cibler la zone où les cartes sont posées.
-     - **Enable 180° input rotation** — ajoute un interrupteur **Rotate input 180°** à la source, pour une
-       caméra montée à l'envers.
-     - Lorsque l'une ou l'autre est activée, la source gagne également le bouton **Preview detector input** :
-       activez-le pour que la source affiche l'image recadrée/pivotée qu'elle envoie au détecteur (afin de
+     - Lorsque qu'elle est activée, l'option **Aperçu de l'entrée du détecteur** apparait:
+       activez-la pour que la source affiche l'image recadrée/pivotée qu'elle envoie au détecteur (afin de
        régler le recadrage directement dans l'aperçu de la source), puis désactivez-le pour revenir à
        l'affichage des cartes détectées.
 3. Le plugin fournit une nouvelle source appelée `Affichage DRAW`. Vous pouvez l'ajouter à votre scène comme n'importe
    quelle autre source.
    Cette source affichera les cartes détectées à l'écran. Vous pouvez choisir la source/scène à partir de laquelle
    détecter les cartes.
-4. Cliquez sur le bouton `Start DRAW` pour lancer le processus de détection. Le plugin commencera à détecter les cartes
+4. Cliquez sur le bouton `Lancer DRAW` pour lancer le processus de détection. Le plugin commencera à détecter les cartes
    en temps réel
-   et les affichera à l'écran à l'aide de la source `Draw Display`. Le plugin commence la détection dès que le bouton
-   `Stop DRAW` s'affiche.
+   et les affichera à l'écran à l'aide de la source `Affichage Draw`. Le plugin commence la détection dès que le bouton
+   `Arrêter DRAW` s'affiche.
    Si vous ne le voyez pas, cela signifie qu'il y a eu un problème.
 5. Dans le cas contraire, vous pouvez profiter du plugin !
 
