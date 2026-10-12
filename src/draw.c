@@ -139,8 +139,7 @@ void draw_source_video_render(void *data, gs_effect_t *effect)
 	vec4_set(&clear_color, 0.0f, 0.0f, 0.0f, 1.0f); // black
 	gs_clear(GS_CLEAR_COLOR, &clear_color, 0.0f, 0);
 	// Map the cropped region into the render target.
-	gs_ortho((float)crop_l, (float)(crop_l + width), (float)crop_t, (float)(crop_t + height), -100.0f,
-		 100.0f);
+	gs_ortho((float)crop_l, (float)(crop_l + width), (float)crop_t, (float)(crop_t + height), -100.0f, 100.0f);
 
 	obs_source_video_render(source);
 	gs_texrender_end(context->render);
@@ -328,8 +327,7 @@ void draw_source_update(void *data, obs_data_t *settings)
 	} else {
 		context->crop_left = context->crop_top = context->crop_right = context->crop_bottom = 0;
 	}
-	context->preview_input = draw_feature_enabled(FEATURE_CROP) &&
-				 obs_data_get_bool(settings, "preview_input");
+	context->preview_input = draw_feature_enabled(FEATURE_CROP) && obs_data_get_bool(settings, "preview_input");
 	if (!context->preview_input) {
 		context->display_height = DEFAULT_DISPLAY_CARD_HEIGHT;
 		context->display_width = DEFAULT_DISPLAY_CARD_WIDTH;

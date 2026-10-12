@@ -241,5 +241,5 @@ void DrawDock::SetButtonEnabled(bool clickable) const
 	if (clickable)
 		this->start_button->setText(obs_module_text("start_draw"));
 	else
-		this->start_button->setText(obs_module_text("preview")) ;
+		this->start_button->setText(obs_module_text("preview"));
 }

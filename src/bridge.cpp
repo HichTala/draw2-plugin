@@ -21,10 +21,7 @@ extern "C" bool draw_feature_enabled(const char *key)
 void draw_dock_set_button_enabled(bool enable)
 {
 	if (DrawDock::instance) {
-		QMetaObject::invokeMethod(
-			DrawDock::instance.data(),
-			"SetButtonEnabled",
-			Qt::QueuedConnection,
-			Q_ARG(bool, enable));
+		QMetaObject::invokeMethod(DrawDock::instance.data(), "SetButtonEnabled", Qt::QueuedConnection,
+					  Q_ARG(bool, enable));
 	}
 }
