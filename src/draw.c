@@ -7,7 +7,7 @@
 
 #include "draw.h"
 #include "shared_memory_wrapper.h"
-#include "feature_flags.h"
+#include "bridge.h"
 
 const char *draw_source_get_name(void *type_data)
 {
@@ -346,6 +346,7 @@ void draw_source_update(void *data, obs_data_t *settings)
 		context->display_height = DEFAULT_DISPLAY_CARD_HEIGHT;
 		context->display_width = DEFAULT_DISPLAY_CARD_WIDTH;
 	}
+	draw_dock_set_button_enabled(!context->preview_input);
 	const char *source_name = obs_data_get_string(settings, "input_selection");
 	obs_source_t *source = obs_get_source_by_name(source_name);
 	if (source) {

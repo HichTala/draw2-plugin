@@ -23,6 +23,7 @@ class DrawDock : public QWidget {
 public:
 	explicit DrawDock(QWidget *parent = nullptr);
 	~DrawDock() override;
+	static QPointer<DrawDock> instance;
 
 private:
 	QWidget *parent = nullptr;
@@ -42,6 +43,9 @@ private:
 	void ResetUi();
 	void AppendLog(const QString &line);
 	void StartChannel(int channel, const QString &python_exe);
+
+public slots:
+	void SetButtonEnabled(bool clickable) const;
 
 private slots:
 	void StartButtonClicked();

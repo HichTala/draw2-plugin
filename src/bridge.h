@@ -10,6 +10,7 @@
 #ifndef DRAW_FEATURE_FLAGS_H
 #define DRAW_FEATURE_FLAGS_H
 
+#pragma once
 #include <stdbool.h>
 
 #ifdef __cplusplus
@@ -20,6 +21,8 @@ extern "C" {
 // key has never been set (or is set to false) this returns false. Backed by the
 // shared QSettings("HichTala", "Draw2") store written by the settings dialog.
 bool draw_feature_enabled(const char *key);
+
+void draw_dock_set_button_enabled(bool enable);
 
 // QSettings keys for the optional features (keep in sync with SettingsDialog).
 #define FEATURE_CROP "feature_crop"
