@@ -74,7 +74,6 @@ void draw_source_get_defaults(obs_data_t *settings)
 	obs_data_set_default_int(settings, "crop_top", 0);
 	obs_data_set_default_int(settings, "crop_right", 0);
 	obs_data_set_default_int(settings, "crop_bottom", 0);
-	obs_data_set_default_bool(settings, "rotate_180", false);
 	obs_data_set_default_bool(settings, "preview_input", false);
 }
 
@@ -139,15 +138,9 @@ void draw_source_video_render(void *data, gs_effect_t *effect)
 	struct vec4 clear_color;
 	vec4_set(&clear_color, 0.0f, 0.0f, 0.0f, 1.0f); // black
 	gs_clear(GS_CLEAR_COLOR, &clear_color, 0.0f, 0);
-	// Map the cropped region into the render target. For a 180° rotation we
-	// simply reverse both axes of the orthographic projection.
-	if (context->rotate_180) {
-		gs_ortho((float)(crop_l + width), (float)crop_l, (float)(crop_t + height), (float)crop_t, -100.0f,
-			 100.0f);
-	} else {
-		gs_ortho((float)crop_l, (float)(crop_l + width), (float)crop_t, (float)(crop_t + height), -100.0f,
-			 100.0f);
-	}
+	// Map the cropped region into the render target.
+	gs_ortho((float)crop_l, (float)(crop_l + width), (float)crop_t, (float)(crop_t + height), -100.0f,
+		 100.0f);
 
 	obs_source_video_render(source);
 	gs_texrender_end(context->render);
@@ -300,13 +293,9 @@ obs_properties_t *draw_source_get_properties(void *data)
 		obs_properties_add_int(props, "crop_bottom", obs_module_text("crop_bottom"), 0, 4320, 1);
 	}
 
-	// Rotate input 180°. Opt-in: hidden unless enabled in settings.
-	if (draw_feature_enabled(FEATURE_ROTATE))
-		obs_properties_add_bool(props, "rotate_180", obs_module_text("rotate_180"));
-
 	// Tuning aid: preview the cropped/rotated input in this source. Shown only
 	// when crop or rotation is enabled (it's pointless otherwise).
-	if (draw_feature_enabled(FEATURE_CROP) || draw_feature_enabled(FEATURE_ROTATE))
+	if (draw_feature_enabled(FEATURE_CROP))
 		obs_properties_add_bool(props, "preview_input", obs_module_text("preview_input"));
 
 	return props;
@@ -339,8 +328,7 @@ void draw_source_update(void *data, obs_data_t *settings)
 	} else {
 		context->crop_left = context->crop_top = context->crop_right = context->crop_bottom = 0;
 	}
-	context->rotate_180 = draw_feature_enabled(FEATURE_ROTATE) && obs_data_get_bool(settings, "rotate_180");
-	context->preview_input = (draw_feature_enabled(FEATURE_CROP) || draw_feature_enabled(FEATURE_ROTATE)) &&
+	context->preview_input = draw_feature_enabled(FEATURE_CROP) &&
 				 obs_data_get_bool(settings, "preview_input");
 	if (!context->preview_input) {
 		context->display_height = DEFAULT_DISPLAY_CARD_HEIGHT;

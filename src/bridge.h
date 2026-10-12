@@ -26,7 +26,6 @@ void draw_dock_set_button_enabled(bool enable);
 
 // QSettings keys for the optional features (keep in sync with SettingsDialog).
 #define FEATURE_CROP "feature_crop"
-#define FEATURE_ROTATE "feature_rotate"
 
 #ifdef __cplusplus
 }

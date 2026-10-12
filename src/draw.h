@@ -24,10 +24,6 @@ struct draw_source_data {
 	uint32_t crop_right;
 	uint32_t crop_bottom;
 
-	// Rotate the captured input 180° before sending it to the detector
-	// (useful when the camera is mounted upside down). Detector-only.
-	bool rotate_180;
-
 	// Tuning aid: when true, this source renders the cropped/rotated input it
 	// feeds the detector (instead of the detected-card overlay), so the crop
 	// can be dialed in from the source's own preview. Detection keeps running.
