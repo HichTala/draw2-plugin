@@ -218,6 +218,10 @@ Quando o plugin está instalado e os "model weights" estão baixados, você pode
      - Quando qualquer uma das duas está ativada, a fonte também ganha o botão **Preview detector input**:
        ative-o para que a fonte exiba o quadro recortado/rotacionado que ela envia ao detector (para ajustar
        o recorte direto no preview da fonte) e desative-o para voltar a exibir as cartas detectadas.
+   - **Enable debug logging** (desativado por padrão): exibe diagnósticos detalhados — o log do painel mostra
+     o lançamento exato do backend (caminhos de deck resolvidos, canal, limites) e cada linha do backend sem
+     filtro, e o log do OBS recebe os detalhes de captura (fonte de entrada, dimensões, recorte/rotação). Útil
+     quando a detecção não está se comportando como esperado.
 3. O plugin irá fornecer uma nova fonte chamada `Draw Display`. Você pode adicioná-la a sua cena como qualquer outra fonte.
    Essa fonte irá exibir as cartas detectadas na tela. Você pode escolher de qual fonte/cena detectar as cartas.
 4. Clique no botão `Start DRAW` para começar o processo de detecção. O plugin irá começar a detectar cartas em tempo real

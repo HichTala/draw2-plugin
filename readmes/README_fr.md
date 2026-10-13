@@ -229,6 +229,10 @@ Une fois le plugin installé et les poids du modèle téléchargés, vous pouvez
        activez-la pour que la source affiche l'image recadrée/pivotée qu'elle envoie au détecteur (afin de
        régler le recadrage directement dans l'aperçu de la source), puis désactivez-le pour revenir à
        l'affichage des cartes détectées.
+   - **Enable debug logging** (désactivé par défaut) : affiche des diagnostics détaillés — le journal du dock
+     montre le lancement exact du backend (chemins de deck résolus, canal, seuils) et chaque ligne du backend
+     sans filtrage, et le journal OBS reçoit les détails de capture (source d'entrée, dimensions,
+     recadrage/rotation). Pratique quand la détection ne se comporte pas comme prévu.
 3. Le plugin fournit une nouvelle source appelée `Affichage DRAW`. Vous pouvez l'ajouter à votre scène comme n'importe
    quelle autre source.
    Cette source affichera les cartes détectées à l'écran. Vous pouvez choisir la source/scène à partir de laquelle
