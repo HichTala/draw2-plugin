@@ -223,7 +223,7 @@ Cuando el plugin está instalado y los pesos del modelo están descargados, pued
        caracteres detectados.
    - **Enable debug logging** (desactivado por defecto): muestra diagnósticos detallados — el log del dock muestra
      el lanzamiento exacto del backend (rutas de deck resueltas, canal, umbrales) y cada línea del backend sin
-     filtrar, y el log de OBS recibe los detalles de captura (fuente de entrada, dimensiones, recorte/rotación).
+     filtrar, y el log de OBS recibe los detalles de captura (fuente de entrada, dimensiones, recorte).
      Útil cuando la detección no funciona como se espera.
 3. El plugin proporciona una nueva fuente llamada `Draw Display`. Puedes añadirla a tu escena como cualquier otra
    fuente. Esta fuente mostrará las cartas detectadas en pantalla. Puedes elegir de qué fuente/escena detectar las
