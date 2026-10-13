@@ -8,9 +8,9 @@
 
 #include "shared_memory_wrapper.h"
 
+#define OBS_SHM_NAME "/obs_shared_memory"
+#define PYTHON_SHM_NAME "/python_shared_memory"
 #ifdef _WIN32
-#define OBS_SHM_NAME "obs_shared_memory"
-#define PYTHON_SHM_NAME "python_shared_memory"
 #include <boost/interprocess/shared_memory_object.hpp>
 #include <boost/interprocess/mapped_region.hpp>
 #include <boost/interprocess/windows_shared_memory.hpp>
@@ -20,8 +20,6 @@
 // leading-slash name (e.g. "/obs_shared_memory"). We MUST use the exact same
 // mechanism and name here; boost::interprocess on macOS falls back to a
 // file in /tmp, which the backend never finds.
-#define POSIX_OBS_SHM "/obs_shared_memory"
-#define POSIX_PY_SHM "/python_shared_memory"
 #include <sys/mman.h>
 #include <sys/stat.h>
 #include <fcntl.h>
@@ -43,21 +41,13 @@ typedef struct shared_frame_header shared_frame_header_t;
 static std::string obs_shm_name(draw_source_data_t *context)
 {
 	int ch = context->channel ? context->channel : 1;
-#ifdef _WIN32
-	return std::string("obs_shared_memory_") + std::to_string(ch);
-#else
-	return std::string("/obs_shared_memory_") + std::to_string(ch);
-#endif
+	return std::string(OBS_SHM_NAME) + std::string("_") + std::to_string(ch);
 }
 
 static std::string py_shm_name(draw_source_data_t *context)
 {
 	int ch = context->channel ? context->channel : 1;
-#ifdef _WIN32
-	return std::string("python_shared_memory_") + std::to_string(ch);
-#else
-	return std::string("/python_shared_memory_") + std::to_string(ch);
-#endif
+	return std::string(PYTHON_SHM_NAME) + std::string("_") + std::to_string(ch);
 }
 
 extern "C" void write_message_to_shared_memory(draw_source_data_t *context, uint8_t *frame, uint32_t linesize,
@@ -270,7 +260,8 @@ extern "C" void ensure_shared_memory_exists(draw_source_data_t *context, uint32_
 #ifdef _WIN32
 	using namespace boost::interprocess;
 	try {
-		shared_memory_object shm(open_only, OBS_SHM_NAME, read_only);
+		std::string oname = obs_shm_name(context);
+		shared_memory_object shm(open_only, oname.c_str(), read_only);
 	} catch (const interprocess_exception &ex) {
 		(void)ex;
 		init_shared_memory(context);
