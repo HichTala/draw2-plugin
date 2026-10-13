@@ -210,11 +210,8 @@ Une fois le plugin installé et les poids du modèle téléchargés, vous pouvez
    - **Sélectionner l'installation Python** : chemin vers le préfixe Python sur lequel le backend `draw` est installé
      (le dossier contenant `bin/` et `lib/`). Il doit s'agir d'une installation Python complète, pas d'un
      virtualenv.
-   - **Sélectionner la liste de deck** : choisissez les deck lists qui contiennent les cartes que vous souhaitez
-     détecter. 3 deck lists
-     peuvent être gérées en même temps. Pour ajouter de nouvelles deck lists, vous pouvez cliquer sur le bouton
-     `Ouvrir le dossier` et glisser-déposer
-     vos fichiers deck lists (au format ydk) dans le dossier ouvert.
+   - **Sélectionner les listes de deck** : choisissez les deck lists qui contiennent les cartes que vous souhaitez
+     détecter — jusqu'à 3. Pour ajouter des deck lists, cliquez sur `Open Folder` et déposez vos fichiers `.ydk` dans le dossier ouvert.
    - **Durée minimale hors écran** : durée minimale pendant laquelle une carte qui vient d'être détectée peut être
      affichée à nouveau.
    - **Durée minimale d'affichage** : durée minimale pendant laquelle une carte est affichée.
@@ -223,6 +220,7 @@ Une fois le plugin installé et les poids du modèle téléchargés, vous pouvez
    - **Fonctionnalités avancées** (désactivées par défaut) : deux réglages optionnels de l'entrée du détecteur qui
      n'affectent que ce que voit le détecteur, pas votre sortie en direct. Activez-les ici, puis configurez les
      valeurs sur la source `Draw Display` :
+     - **Activer deux joueurs** — ajoute un ensemble de deck lists **Joueur 2** et lance un **détecteur distinct par joueur**, permettant de traiter deux joueurs simultanément. Laissez cette option désactivée pour une configuration à un seul joueur.
      - **Activer le recadrage de l'entrée du détecteur** — ajoute des champs **Rogner (Gauche/Haut/Droite/Bas, px)** à la source,
        pour cibler la zone où les cartes sont posées.
      - Lorsque qu'elle est activée, l'option **Aperçu de l'entrée du détecteur** apparait:
@@ -236,7 +234,8 @@ Une fois le plugin installé et les poids du modèle téléchargés, vous pouvez
 3. Le plugin fournit une nouvelle source appelée `Affichage DRAW`. Vous pouvez l'ajouter à votre scène comme n'importe
    quelle autre source.
    Cette source affichera les cartes détectées à l'écran. Vous pouvez choisir la source/scène à partir de laquelle
-   détecter les cartes.
+   détecter les cartes. Avec le mode deux joueurs activé, utilisez la propriété **Détecteur / Joueur** de la source pour choisir de quel détecteur elle
+   lit (**Joueur 1** ou **Joueur 2**) ; ajoutez un `Affichage Draw` par joueur pour afficher les deux simultanément.
 4. Cliquez sur le bouton `Lancer DRAW` pour lancer le processus de détection. Le plugin commencera à détecter les cartes
    en temps réel
    et les affichera à l'écran à l'aide de la source `Affichage Draw`. Le plugin commence la détection dès que le bouton

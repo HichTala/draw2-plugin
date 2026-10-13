@@ -203,10 +203,9 @@ Cuando el plugin está instalado y los pesos del modelo están descargados, pued
 2. En el dock de Draw 2 puedes configurar los ajustes del plugin haciendo clic en el icono de engranaje junto al
    botón `Start DRAW`:
    - **Select Python installation**: ruta al prefijo de Python que tiene instalado el backend `draw` (la carpeta que
-     contiene `bin/` y `lib/`). Debe ser una instalación de Python completa, no un virtualenv.
-   - **Select Deck List**: elige el archivo de deck list que contiene las cartas que quieres detectar. Se pueden
-     gestionar hasta 3 deck lists a la vez. Para añadir nuevas deck lists, puedes hacer clic en el botón
-     `Open Folder` y arrastrar y soltar tus archivos de deck list (en formato ydk) en la carpeta que se abre.
+     contiene `bin/` y `lib/`). Debe ser una instalación de Python completa, no un virtualenv. Consulta la sección de
+     configuración de macOS para más detalles.
+   - **Select Deck Lists**: elige los archivos de deck list con las cartas que quieres detectar — hasta 3. Para añadir deck lists, haz clic en `Open Folder` y arrastra tus archivos `.ydk` a la carpeta que se abre.
    - **Minimum Out of Screen Time**: el tiempo mínimo que debe pasar para que una carta recién detectada pueda volver
      a mostrarse.
    - **Minimum Screen Time**: el tiempo mínimo que se muestra una carta.
@@ -215,6 +214,7 @@ Cuando el plugin está instalado y los pesos del modelo están descargados, pued
    - **Advanced features** (desactivadas por defecto): dos ajustes opcionales de la entrada del detector que solo
      afectan a lo que ve el detector, no a tu salida en directo. Actívalas aquí y configura los valores en la fuente
      `Draw Display`:
+     - **Enable two players** — añade un conjunto de deck lists de **Player 2** y ejecuta un **detector independiente por jugador**, de modo que dos jugadores pueden procesarse a la vez. Déjalo desactivado para una configuración normal de un solo jugador.
      - **Enable detector input crop** — añade los campos **Crop (Left/Top/Right/Bottom, px)** a la fuente, para
        enfocar la detección en la región donde se colocan las cartas.
      - Cuando está activada, la fuente también muestra el botón **Vista previa de la entrada del detector**:
@@ -227,7 +227,7 @@ Cuando el plugin está instalado y los pesos del modelo están descargados, pued
      Útil cuando la detección no funciona como se espera.
 3. El plugin proporciona una nueva fuente llamada `Draw Display`. Puedes añadirla a tu escena como cualquier otra
    fuente. Esta fuente mostrará las cartas detectadas en pantalla. Puedes elegir de qué fuente/escena detectar las
-   cartas.
+   cartas. Con el modo de dos jugadores activado, usa la propiedad **Detector / Player** de la fuente para seleccionar de qué detector leer (**Player 1** o **Player 2**); añade un `Draw Display` por jugador para mostrar ambos a la vez.
 4. Haz clic en el botón `Start DRAW` para iniciar el proceso de detección. El plugin empezará a detectar cartas en
    tiempo real y a mostrarlas en pantalla mediante la fuente `Draw Display`. El plugin comienza a detectar en el
    momento en que ves el botón `Stop DRAW`. Si no lo ves, algo salió mal.

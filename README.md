@@ -203,26 +203,28 @@ When the plugin is installed and the model weights are downloaded, you can launc
 1. Open the `Docks` menu and select `Draw 2` to activate the plugin dock.
 2. In the Draw 2 dock, you can configure the plugin settings by clicking on the gear icon next to `Start DRAW` button:
    - **Select Python installation**: Path to the Python prefix that has the `draw` backend installed (the folder
-     containing `bin/` and `lib/`). Must be a full Python install, not a virtualenv.
-   - **Select Deck List**: Choose the deck list file that contains the cards you want to detect. 3 deck lists
-     can be handled at the same time. To add new deck lists, you can click the `Open Folder` button and drag and drop
-     your deck list files (in ydk format) into the opened folder.
+     containing `bin/` and `lib/`). Must be a full Python install, not a virtualenv. See the macOS setup section
+     for details.
+   - **Select Deck Lists**: Choose the deck list file(s) with the cards you want to detect — up to 3.
+     To add deck lists, click `Open Folder` and drop your `.ydk` files into the opened folder.
    - **Minimum Out of Screen Time**: The minimum time a card just detected can be displayed again.
    - **Minimum Screen Time**: The minimum time a card is displayed.
    - **Confidence Threshold**: Set the minimum confidence level for card detection. Detections below this threshold
      will be ignored.
-   - **Advanced features** (off by default): two optional detector-input tweaks that only affect what the detector
-     sees, not your live output. Enable them here, then configure the values on the `Draw Display` source:
-     - **Enable detector input crop** — adds **Crop (Left/Top/Right/Bottom, px)** fields to the source, to focus
-       detection on the region where cards are placed.
-     - When enabled, the source also gains a **Preview detector input** toggle: turn it on to make the
+   - **Advanced features** (all off by default): opt-in toggles. Enable one here, then configure it where noted.
+     - **Enable two players** — adds a **Player 2** set of deck lists and runs a **separate detector per player**,
+       so two players can be processed at once. Leave it off for a single-player setup.
+     - **Enable detector input crop** — adds **Crop (Left/Top/Right/Bottom, px)** fields to the `Draw Display`
+       source, to focus detection on the region where cards are placed.
+     - When crop is enabled, the source also gains a **Preview detector input** toggle: turn it on to make the
        source render the cropped frame it feeds the detector (so you can dial in the crop right in the
        source's preview), then turn it off to go back to showing detected cards.
-   - **Enable debug logging** (off by default): surfaces verbose diagnostics — the dock log shows the exact backend
-     launch (resolved deck paths, channel, thresholds) and every backend line unfiltered, and the OBS log gets the
-     capture details (input source, dimensions, crop). Handy when detection isn't behaving.
+     - **Enable debug logging** — surfaces verbose diagnostics: the dock log shows the exact backend launch
+       (resolved deck paths, channel, thresholds) and every backend line unfiltered, and the OBS log gets the
+       capture details (input source, dimensions, crop). Handy when detection isn't behaving.
 3. The plugin provide a new source called `Draw Display`. You can add it to your scene like any other source.
    This source will display the detected cards on the screen. You can choose what source/scene to detect cards from.
+   With two-player mode enabled, use the **Detector / Player** property on the source to pick which detector it reads from (**Player 1** or **Player 2**); add one `Draw Display` per player to show both at once.
 4. Click the `Start DRAW` button to start the detection process. The plugin will start detecting cards in real time
    and display them on the screen using the `Draw Display` source. The plugin start detecting from the moment you see
    the

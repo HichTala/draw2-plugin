@@ -128,9 +128,15 @@ void DrawDock::StartPythonDraw()
 
 	this->ready_count = 0;
 	this->launched_count = 0;
-	AppendLog("▶ Launching the card detector… (loading models, first run may take a while)");
+
+	// Opt-in: a second detector (player 2) only when the feature is enabled.
+	bool two_players = draw_feature_enabled(FEATURE_CHANNEL);
+	AppendLog(two_players ? "▶ Launching detectors for 2 players… (loading models, first run may take a while)"
+			      : "▶ Launching the card detector… (loading models, first run may take a while)");
 
 	StartChannel(1, python_exe);
+	if (two_players)
+		StartChannel(2, python_exe);
 }
 
 void DrawDock::StartChannel(int channel, const QString &python_exe)
@@ -142,10 +148,12 @@ void DrawDock::StartChannel(int channel, const QString &python_exe)
 	int min_screen = settings.value("minimum_screen_time", 6).value<int>();
 	int confidence = settings.value("confidence_slider", 5).value<int>();
 
+	// Per-player deck lists: player 1 uses deck_listN, player 2 deck_listN_p2.
+	QString sfx = (channel == 2) ? "_p2" : "";
 	QString dir = QString::fromUtf8(get_decklists_path()) + "/";
-	QString deck_list = dir + settings.value("deck_list1", "").toString() + ";" + dir +
-			    settings.value("deck_list2", "").toString() + ";" + dir +
-			    settings.value("deck_list3", "").toString() + ";";
+	QString deck_list = dir + settings.value("deck_list1" + sfx, "").toString() + ";" + dir +
+			    settings.value("deck_list2" + sfx, "").toString() + ";" + dir +
+			    settings.value("deck_list3" + sfx, "").toString() + ";";
 
 	auto *process = new QProcess(this);
 	process->setProcessChannelMode(QProcess::MergedChannels);
