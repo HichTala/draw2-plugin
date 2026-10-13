@@ -19,6 +19,8 @@
 #include <unistd.h>
 #endif
 
+QPointer<DrawDock> DrawDock::instance;
+
 DrawDock::DrawDock(QWidget *parent) : QWidget(parent)
 {
 	this->parent = parent;
@@ -57,6 +59,8 @@ DrawDock::DrawDock(QWidget *parent) : QWidget(parent)
 
 	connect(start_button, SIGNAL(clicked()), SLOT(StartButtonClicked()));
 	connect(settings_button, SIGNAL(clicked()), SLOT(SettingsButtonClicked()));
+
+	instance = this;
 }
 
 DrawDock::~DrawDock()
@@ -229,4 +233,13 @@ void DrawDock::StopPythonDraw()
 		AppendLog("■ Stopping detectors…");
 	this->ready_count = 0;
 	this->launched_count = 0;
+}
+
+void DrawDock::SetButtonEnabled(bool clickable) const
+{
+	this->start_button->setEnabled(clickable);
+	if (clickable)
+		this->start_button->setText(obs_module_text("start_draw"));
+	else
+		this->start_button->setText(obs_module_text("preview"));
 }

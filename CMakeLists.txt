@@ -22,6 +22,8 @@ add_library(
   src/draw.h
   src/shared_memory_wrapper.cpp
   src/shared_memory_wrapper.h
+  src/bridge.cpp
+  src/bridge.h
   src/plugin-path.h
 )
 
