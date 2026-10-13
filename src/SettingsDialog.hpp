@@ -33,7 +33,7 @@ private:
 	QSpinBox *minimum_out_of_screen_time = new QSpinBox;
 	QSpinBox *minimum_screen_time = new QSpinBox;
 	QSlider *confidence_slider = new QSlider(Qt::Horizontal);
-	// Opt-in detector-input features (off by default). See feature_flags.h.
+	// Opt-in detector-input features (off by default). See bridge.h.
 	QCheckBox *feature_crop = new QCheckBox(obs_module_text("feature_crop"));
 	QCheckBox *feature_debug = new QCheckBox(obs_module_text("feature_debug"));
 	QPushButton *python_browse_button = new QPushButton(obs_module_text("browse"));
