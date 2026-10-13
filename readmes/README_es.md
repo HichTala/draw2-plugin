@@ -217,12 +217,14 @@ Cuando el plugin está instalado y los pesos del modelo están descargados, pued
      `Draw Display`:
      - **Enable detector input crop** — añade los campos **Crop (Left/Top/Right/Bottom, px)** a la fuente, para
        enfocar la detección en la región donde se colocan las cartas.
-     - **Enable 180° input rotation** — añade el interruptor **Rotate input 180°** a la fuente, para una cámara
-       montada al revés.
-     - Cuando alguna de las dos está activada, la fuente también gana el interruptor **Preview detector input**:
-       actívalo para que la fuente muestre el fotograma recortado/rotado que alimenta al detector (así puedes
-       ajustar el recorte directamente en el preview de la fuente), y desactívalo para volver a mostrar las
-       cartas detectadas.
+     - Cuando está activada, la fuente también muestra el botón **Vista previa de la entrada del detector**:
+       Actívalo para que la fuente muestre el fotograma recortado o girado que se envía al detector (de modo que puedas
+       ajustar el recorte directamente en la vista previa de la fuente), y desactívalo para volver a mostrar los
+       caracteres detectados.
+   - **Enable debug logging** (desactivado por defecto): muestra diagnósticos detallados — el log del dock muestra
+     el lanzamiento exacto del backend (rutas de deck resueltas, canal, umbrales) y cada línea del backend sin
+     filtrar, y el log de OBS recibe los detalles de captura (fuente de entrada, dimensiones, recorte).
+     Útil cuando la detección no funciona como se espera.
 3. El plugin proporciona una nueva fuente llamada `Draw Display`. Puedes añadirla a tu escena como cualquier otra
    fuente. Esta fuente mostrará las cartas detectadas en pantalla. Puedes elegir de qué fuente/escena detectar las
    cartas.

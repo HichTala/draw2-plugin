@@ -3,6 +3,7 @@
 //
 
 #include "plugin-path.h"
+#include "bridge.h"
 
 #include "DrawDock.hpp"
 #include "SettingsDialog.hpp"
@@ -157,8 +158,10 @@ void DrawDock::StartChannel(int channel, const QString &python_exe)
 			if (line.isEmpty())
 				continue;
 			blog(LOG_INFO, "[draw2-backend P%d] %s", channel, line.constData());
-			if (!line.contains("unauthenticated requests") && !line.contains("use_fast") &&
-			    !line.contains("Loading weights") && !line.startsWith("mapped size")) {
+			// Debug mode surfaces every backend line; otherwise filter the noisy ones.
+			if (draw_feature_enabled(FEATURE_DEBUG) ||
+			    (!line.contains("unauthenticated requests") && !line.contains("use_fast") &&
+			     !line.contains("Loading weights") && !line.startsWith("mapped size"))) {
 				AppendLog(QString("[P%1] ").arg(channel) + QString::fromUtf8(line));
 			}
 			if (line.contains("Waiting for OBS to start")) {
@@ -199,6 +202,21 @@ void DrawDock::StartChannel(int channel, const QString &python_exe)
 	     << QString::number(channel);
 
 	blog(LOG_INFO, "Draw2: launching backend P%d: %s", channel, python_exe.toUtf8().constData());
+
+	// Debug mode: surface the exact launch parameters in the dock log, so the
+	// resolved deck paths / channel / thresholds are visible without digging.
+	if (draw_feature_enabled(FEATURE_DEBUG)) {
+		AppendLog(QString("· [P%1] debug: python=%2").arg(channel).arg(python_exe));
+		AppendLog(QString("· [P%1] debug: model=%2 channel=%3 confidence=%4 min_out=%5 min_screen=%6")
+				  .arg(channel)
+				  .arg(model_choice)
+				  .arg(channel)
+				  .arg(confidence)
+				  .arg(min_out)
+				  .arg(min_screen));
+		AppendLog(QString("· [P%1] debug: deck_list=%2").arg(channel).arg(deck_list));
+	}
+
 	process->start(python_exe, args);
 }
 
