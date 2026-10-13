@@ -346,13 +346,11 @@ void draw_source_update(void *data, obs_data_t *settings)
 	}
 
 	// Debug mode: log the resolved capture config to the OBS log (Help > Log
-	// Files), so framing/crop/rotation issues are easy to spot.
+	// Files), so framing/crop issues are easy to spot.
 	if (draw_feature_enabled(FEATURE_DEBUG)) {
-		blog(LOG_INFO,
-		     "[draw2] debug: input='%s' source=%ux%u crop(l=%u t=%u r=%u b=%u) rotate_180=%d channel=%d",
+		blog(LOG_INFO, "[draw2] debug: input='%s' source=%ux%u crop(l=%u t=%u r=%u b=%u) channel=%d",
 		     source_name ? source_name : "", context->source_width, context->source_height, context->crop_left,
-		     context->crop_top, context->crop_right, context->crop_bottom, context->rotate_180,
-		     context->channel);
+		     context->crop_top, context->crop_right, context->crop_bottom, context->channel);
 	}
 }
 

@@ -3,7 +3,7 @@
 //
 
 #include "plugin-path.h"
-#include "feature_flags.h"
+#include "bridge.h"
 
 #include "DrawDock.hpp"
 #include "SettingsDialog.hpp"
