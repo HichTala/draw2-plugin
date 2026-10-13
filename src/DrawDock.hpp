@@ -7,6 +7,7 @@
 
 #include <QDockWidget>
 #include <QWidget>
+#include <QPointer>
 #include <QPushButton>
 #include <QHBoxLayout>
 #include <QVBoxLayout>
