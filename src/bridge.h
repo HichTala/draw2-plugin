@@ -22,7 +22,10 @@ extern "C" {
 // shared QSettings("HichTala", "Draw2") store written by the settings dialog.
 bool draw_feature_enabled(const char *key);
 
-void draw_dock_set_button_enabled(bool enable);
+// Tells the dock whether a Draw Display source is showing its input preview.
+// `source` only identifies the caller (each source reports for itself); the
+// Start button stays disabled while any source is previewing.
+void draw_dock_set_preview(const void *source, bool active);
 
 // QSettings keys for the optional features (keep in sync with SettingsDialog).
 #define FEATURE_CHANNEL "feature_channel"
