@@ -18,10 +18,10 @@ extern "C" bool draw_feature_enabled(const char *key)
 	return settings.value(QString::fromUtf8(key), false).toBool();
 }
 
-void draw_dock_set_button_enabled(bool enable)
+void draw_dock_set_preview(const void *source, bool active)
 {
 	if (DrawDock::instance) {
-		QMetaObject::invokeMethod(DrawDock::instance.data(), "SetButtonEnabled", Qt::QueuedConnection,
-					  Q_ARG(bool, enable));
+		QMetaObject::invokeMethod(DrawDock::instance.data(), "SetPreviewActive", Qt::QueuedConnection,
+					  Q_ARG(quintptr, reinterpret_cast<quintptr>(source)), Q_ARG(bool, active));
 	}
 }
