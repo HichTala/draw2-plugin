@@ -7,8 +7,8 @@
 // state to both the C source code (draw.c) and the C++ code.
 //
 
-#ifndef DRAW_FEATURE_FLAGS_H
-#define DRAW_FEATURE_FLAGS_H
+#ifndef DRAW_BRIDGE_H
+#define DRAW_BRIDGE_H
 
 #pragma once
 #include <stdbool.h>
@@ -33,4 +33,4 @@ void draw_dock_set_button_enabled(bool enable);
 }
 #endif
 
-#endif // DRAW_FEATURE_FLAGS_H
+#endif // DRAW_BRIDGE_H

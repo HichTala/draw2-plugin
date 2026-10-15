@@ -1,5 +1,5 @@
 //
-// Optional, opt-in plugin features. See feature_flags.h.
+// Bridge between the C source code (draw.c) and the C++ dock. See bridge.h.
 //
 
 #include "bridge.h"
