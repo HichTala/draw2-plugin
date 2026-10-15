@@ -224,7 +224,7 @@ Une fois le plugin installé et les poids du modèle téléchargés, vous pouvez
      - **Activer le recadrage de l'entrée du détecteur** — ajoute des champs **Rogner (Gauche/Haut/Droite/Bas, px)** à la source,
        pour cibler la zone où les cartes sont posées.
      - Lorsque qu'elle est activée, l'option **Aperçu de l'entrée du détecteur** apparait:
-       activez-la pour que la source affiche l'image recadrée/pivotée qu'elle envoie au détecteur (afin de
+       activez-la pour que la source affiche l'image recadrée qu'elle envoie au détecteur (afin de
        régler le recadrage directement dans l'aperçu de la source), puis désactivez-le pour revenir à
        l'affichage des cartes détectées.
    - **Enable debug logging** (désactivé par défaut) : affiche des diagnostics détaillés — le journal du dock

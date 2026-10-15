@@ -24,7 +24,7 @@ struct draw_source_data {
 	uint32_t crop_right;
 	uint32_t crop_bottom;
 
-	// Tuning aid: when true, this source renders the cropped/rotated input it
+	// Tuning aid: when true, this source renders the cropped input it
 	// feeds the detector (instead of the detected-card overlay), so the crop
 	// can be dialed in from the source's own preview. Detection keeps running.
 	bool preview_input;

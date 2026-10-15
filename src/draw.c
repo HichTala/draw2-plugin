@@ -176,7 +176,7 @@ void draw_source_video_render(void *data, gs_effect_t *effect)
 
 	obs_source_release(source);
 
-	// Tuning aid: render the cropped/rotated input this source feeds the
+	// Tuning aid: render the cropped input this source feeds the
 	// detector (instead of the detected-card overlay), so the crop can be
 	// dialed in from this source's own preview. Detection still runs above.
 	if (context->preview_input) {
@@ -301,8 +301,8 @@ obs_properties_t *draw_source_get_properties(void *data)
 		obs_properties_add_int(props, "crop_bottom", obs_module_text("crop_bottom"), 0, 4320, 1);
 	}
 
-	// Tuning aid: preview the cropped/rotated input in this source. Shown only
-	// when crop or rotation is enabled (it's pointless otherwise).
+	// Tuning aid: preview the cropped input in this source. Shown only
+	// when crop is enabled (it's pointless otherwise).
 	if (draw_feature_enabled(FEATURE_CROP))
 		obs_properties_add_bool(props, "preview_input", obs_module_text("preview_input"));
 
