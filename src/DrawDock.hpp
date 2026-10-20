@@ -51,15 +51,15 @@ private:
 	void AppendLog(const QString &line);
 	void StartChannel(int channel, const QString &python_exe);
 
-// To use if preview interfere with detection in the future
-// public slots:
-// 	void SetPreviewActive(quintptr source, bool active);
-
 private slots:
 	void StartButtonClicked();
 	void SettingsButtonClicked();
 	void StartPythonDraw();
 	void StopPythonDraw();
 };
+
+// To use if preview interfere with detection in the future
+// public slots:
+// 	void SetPreviewActive(quintptr source, bool active);
 
 #endif //DRAW_DOCK_H
