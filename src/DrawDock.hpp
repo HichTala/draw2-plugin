@@ -17,6 +17,7 @@
 #include <QIcon>
 #include <QStyle>
 #include <QProcess>
+#include <QSet>
 
 class DrawDock : public QWidget {
 	Q_OBJECT
@@ -40,13 +41,15 @@ private:
 	int launched_count = 0;
 	int ready_count = 0;
 	QPlainTextEdit *log_view = new QPlainTextEdit();
+	// Draw Display sources currently showing their input preview.
+	// To use if preview interfere with detection in the future
+	// QSet<quintptr> previewing_sources;
 
 	void ResetUi();
+	// To use if preview interfere with detection in the future
+	// void RefreshStartButton();
 	void AppendLog(const QString &line);
 	void StartChannel(int channel, const QString &python_exe);
-
-public slots:
-	void SetButtonEnabled(bool clickable) const;
 
 private slots:
 	void StartButtonClicked();
@@ -54,5 +57,9 @@ private slots:
 	void StartPythonDraw();
 	void StopPythonDraw();
 };
+
+// To use if preview interfere with detection in the future
+// public slots:
+// 	void SetPreviewActive(quintptr source, bool active);
 
 #endif //DRAW_DOCK_H

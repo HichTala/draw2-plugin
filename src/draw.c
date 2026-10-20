@@ -29,6 +29,8 @@ void *draw_source_create(obs_data_t *settings, obs_source_t *source)
 void draw_source_destroy(void *data)
 {
 	draw_source_data_t *context = data;
+	// To use if preview interfere with detection in the future
+	// draw_dock_set_preview(context, false);
 	if (context->source) {
 		obs_source_t *source = obs_weak_source_get_source(context->source);
 		if (source) {
@@ -348,7 +350,8 @@ void draw_source_update(void *data, obs_data_t *settings)
 		context->display_height = DEFAULT_DISPLAY_CARD_HEIGHT;
 		context->display_width = DEFAULT_DISPLAY_CARD_WIDTH;
 	}
-	draw_dock_set_button_enabled(!context->preview_input);
+	// To use if preview interfere with detection in the future
+	// draw_dock_set_preview(context, context->preview_input);
 	const char *source_name = obs_data_get_string(settings, "input_selection");
 	obs_source_t *source = obs_get_source_by_name(source_name);
 	if (source) {

@@ -261,11 +261,25 @@ void DrawDock::StopPythonDraw()
 	this->launched_count = 0;
 }
 
-void DrawDock::SetButtonEnabled(bool clickable) const
-{
-	this->start_button->setEnabled(clickable);
-	if (clickable)
-		this->start_button->setText(obs_module_text("start_draw"));
-	else
-		this->start_button->setText(obs_module_text("preview"));
-}
+// To use if preview interfere with detection in the future
+// void DrawDock::SetPreviewActive(quintptr source, bool active)
+// {
+// 	if (active)
+// 		this->previewing_sources.insert(source);
+// 	else
+// 		this->previewing_sources.remove(source);
+// 	RefreshStartButton();
+// }
+
+// The preview only blocks starting detection. While detectors are starting or
+// running (button checked) the button keeps its Starting/Stop state, so it can
+// always be used to stop them.
+// void DrawDock::RefreshStartButton()
+// {
+// 	if (this->start_button->isChecked())
+// 		return;
+// 	bool previewing = !this->previewing_sources.isEmpty();
+// 	blog(LOG_INFO, "Draw2: previewing started");
+// 	this->start_button->setEnabled(!previewing);
+// 	this->start_button->setText(obs_module_text(previewing ? "preview" : "start_draw"));
+// }

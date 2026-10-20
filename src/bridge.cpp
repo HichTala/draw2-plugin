@@ -4,8 +4,6 @@
 
 #include "bridge.h"
 
-#include "DrawDock.hpp"
-
 #include <QSettings>
 #include <QString>
 
@@ -18,10 +16,11 @@ extern "C" bool draw_feature_enabled(const char *key)
 	return settings.value(QString::fromUtf8(key), false).toBool();
 }
 
-void draw_dock_set_button_enabled(bool enable)
-{
-	if (DrawDock::instance) {
-		QMetaObject::invokeMethod(DrawDock::instance.data(), "SetButtonEnabled", Qt::QueuedConnection,
-					  Q_ARG(bool, enable));
-	}
-}
+// To use if preview interfere with detection in the future
+// void draw_dock_set_preview(const void *source, bool active)
+// {
+// 	if (DrawDock::instance) {
+// 		QMetaObject::invokeMethod(DrawDock::instance.data(), "SetPreviewActive", Qt::QueuedConnection,
+// 					  Q_ARG(quintptr, reinterpret_cast<quintptr>(source)), Q_ARG(bool, active));
+// 	}
+// }
