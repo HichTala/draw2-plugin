@@ -42,15 +42,18 @@ private:
 	int ready_count = 0;
 	QPlainTextEdit *log_view = new QPlainTextEdit();
 	// Draw Display sources currently showing their input preview.
-	QSet<quintptr> previewing_sources;
+	// To use if preview interfere with detection in the future
+	// QSet<quintptr> previewing_sources;
 
 	void ResetUi();
-	void RefreshStartButton();
+	// To use if preview interfere with detection in the future
+	// void RefreshStartButton();
 	void AppendLog(const QString &line);
 	void StartChannel(int channel, const QString &python_exe);
 
-public slots:
-	void SetPreviewActive(quintptr source, bool active);
+// To use if preview interfere with detection in the future
+// public slots:
+// 	void SetPreviewActive(quintptr source, bool active);
 
 private slots:
 	void StartButtonClicked();
