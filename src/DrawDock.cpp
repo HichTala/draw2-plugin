@@ -208,15 +208,16 @@ void DrawDock::StartChannel(int channel, const QString &python_exe)
 						for (const QString &ln : ydk.split('\n'))
 							if (!ln.trimmed().isEmpty() && ln.trimmed().at(0).isDigit())
 								cards++;
-						AppendLog(QString("· [P%1] debug: %2 loaded from %3 (~%4 card IDs) → %5")
-								  .arg(channel)
-								  .arg(what)
-								  .arg(is_url ? QString("%1 (%2 bytes)")
-											.arg(value)
-											.arg(body.size())
-									      : QString("ydke code"))
-								  .arg(cards)
-								  .arg(out_path));
+						AppendLog(
+							QString("· [P%1] debug: %2 loaded from %3 (~%4 card IDs) → %5")
+								.arg(channel)
+								.arg(what)
+								.arg(is_url ? QString("%1 (%2 bytes)")
+										      .arg(value)
+										      .arg(body.size())
+									    : QString("ydke code"))
+								.arg(cards)
+								.arg(out_path));
 					}
 				}
 			}
