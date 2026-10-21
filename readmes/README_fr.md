@@ -232,6 +232,7 @@ Une fois le plugin installé et les poids du modèle téléchargés, vous pouvez
      sans filtrage, et le journal OBS reçoit les détails de capture (source d'entrée, dimensions,
      recadrage). Pratique quand la détection ne se comporte pas comme prévu.
    - **Activer la decklist distante** — permet à chaque joueur de charger son deck depuis une URL HTTP(S) ou un code YDKE au lieu d'un fichier `.ydk` local ; voir la note sous la source `Affichage Draw`.
+   - **Exporter les infos des cartes détectées vers des fichiers** — écrit les cartes détectées (JSON / JSONL / texte brut) dans un dossier par utilisateur, pour des sources Texte OBS, des bots ou des overlays ; voir la note sous la source `Affichage Draw`.
 3. Le plugin fournit une nouvelle source appelée `Affichage DRAW`. Vous pouvez l'ajouter à votre scène comme n'importe
    quelle autre source.
    Cette source affichera les cartes détectées à l'écran. Vous pouvez choisir la source/scène à partir de laquelle
@@ -261,6 +262,28 @@ Une fois le plugin installé et les poids du modèle téléchargés, vous pouvez
    >
    > ⚠️ Les URLs et la valeur de l'en-tête sont stockées en texte brut dans QSettings, comme tous les autres paramètres
    > du plugin — évitez d'y placer des secrets à longue durée de vie.
+
+   > 💡 Le plugin peut également **exporter les informations des cartes détectées vers des fichiers** afin que vous
+   > puissiez les afficher n'importe où — une source Texte OBS que le streamer lit en direct, des bots ou des overlays
+   > HTML/navigateur. C'est **désactivé par défaut** — activez *Exporter les infos des cartes détectées vers des fichiers*
+   > dans les paramètres de Draw 2 (onglet *Fonctionnalités*) et redémarrez DRAW. Pendant l'exécution, chaque détecteur
+   > écrit dans `plugin_config/draw2-plugin/state/` (par joueur `N`) :
+   > - `current_pN.json` — cartes actuellement à l'écran :
+   >   `{ "updated_at", "channel", "cards": [ { "id", "name", "type", "attribute", "race", "atk", "def", "desc" } ] }`
+   >   (les champs enrichis proviennent de YGOPRODeck ; les champs manquants sont omis).
+   > - `events_pN.jsonl` — journal en ajout seul, un JSON par ligne :
+   >   `{ "ts", "event": "appeared" | "disappeared", "card": { … } }`.
+   > - `current_card_pN.txt` — texte brut, les noms des cartes à l'écran (séparés par des sauts de ligne). Pointez une
+   >   source **Text** OBS vers ce fichier (*Read from file*) pour afficher la carte actuelle en direct.
+   >
+   > La langue des métadonnées est l'anglais par défaut ; définissez la clé `card_info_lang` dans le magasin de
+   > paramètres de Draw 2 sur l'une des valeurs `en` / `fr` / `de` / `it` / `pt` (YGOPRODeck ne fournit pas l'espagnol).
+   > La moitié backend vit dans le backend `draw2` ; le plugin se contente de la pointer vers le dossier de sortie.
+   >
+   > Par défaut, le backend télécharge une fois la base de données complète des cartes (en arrière-plan) afin que les
+   > métadonnées soient résolues **hors ligne**, sans requête par carte. Décochez
+   > **Télécharger la base de cartes complète pour une utilisation hors ligne** pour ignorer le téléchargement et les
+   > résoudre paresseusement, une carte à la fois.
 4. Cliquez sur le bouton `Lancer DRAW` pour lancer le processus de détection. Le plugin commencera à détecter les cartes
    en temps réel
    et les affichera à l'écran à l'aide de la source `Affichage Draw`. Le plugin commence la détection dès que le bouton

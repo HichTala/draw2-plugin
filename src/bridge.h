@@ -29,6 +29,7 @@ void draw_dock_set_button_enabled(bool enable);
 #define FEATURE_CROP "feature_crop"
 #define FEATURE_DEBUG "feature_debug"
 #define FEATURE_REMOTE_DECK "feature_remote_deck"
+#define FEATURE_CARD_INFO "feature_card_info"
 
 #ifdef __cplusplus
 }
