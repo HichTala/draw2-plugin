@@ -25,6 +25,8 @@ add_library(
   src/bridge.cpp
   src/bridge.h
   src/plugin-path.h
+  src/RemoteDeck.cpp
+  src/RemoteDeck.hpp
 )
 
 find_package(libobs REQUIRED)
@@ -45,8 +47,8 @@ if(ENABLE_FRONTEND_API)
 endif()
 
 if(ENABLE_QT)
-  find_package(Qt6 COMPONENTS Widgets Core)
-  target_link_libraries(${CMAKE_PROJECT_NAME} PRIVATE Qt6::Core Qt6::Widgets)
+  find_package(Qt6 COMPONENTS Widgets Core Network)
+  target_link_libraries(${CMAKE_PROJECT_NAME} PRIVATE Qt6::Core Qt6::Widgets Qt6::Network)
 
   if(APPLE AND TARGET WrapOpenGL::WrapOpenGL)
     # AGL.framework was removed from the macOS 26 SDK, but Qt's FindWrapOpenGL

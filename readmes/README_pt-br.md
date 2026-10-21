@@ -220,9 +220,56 @@ Quando o plugin está instalado e os "model weights" estão baixados, você pode
      o lançamento exato do backend (caminhos de deck resolvidos, canal, limites) e cada linha do backend sem
      filtro, e o log do OBS recebe os detalhes de captura (fonte de entrada, dimensões, recorte). Útil
      quando a detecção não está se comportando como esperado.
+   - **Enable remote decklist** — permite que cada jogador carregue seu deck a partir de uma URL HTTP(S) ou de um código YDKE em vez de um arquivo `.ydk` local; veja a nota abaixo da fonte `Draw Display`.
+   - **Export detected card info to files** — escreve as cartas detectadas (JSON / JSONL / texto simples) em uma pasta por usuário, para fontes de texto do OBS, bots ou overlays; veja a nota abaixo da fonte `Draw Display`.
 3. O plugin irá fornecer uma nova fonte chamada `Draw Display`. Você pode adicioná-la a sua cena como qualquer outra fonte.
    Essa fonte irá exibir as cartas detectadas na tela. Você pode escolher de qual fonte/cena detectar as cartas.
    Com o modo de dois jogadores ativado, use a propriedade **Detector / Player** da fonte para escolher de qual detector ela lê (**Player 1** ou **Player 2**); adicione um `Draw Display` por jogador para exibir ambos ao mesmo tempo.
+
+   > 💡 O plugin também pode carregar uma decklist a partir de uma **URL HTTP(S)** ou de um **código YDKE** (`ydke://…`)
+   > em vez de um arquivo `.ydk` local — útil quando sua lista de cartas é servida por uma API remota ou sistema de
+   > gerenciamento de torneios, ou compartilhada como link YDKE. Vem **desativada por padrão** — ative **Enable remote
+   > decklist** nas configurações do Draw 2 (*Recursos avançados*); as fontes são configuradas depois em uma aba
+   > dedicada **Decklist**.
+   >
+   > Dois modos estão disponíveis após a ativação:
+   > - **Import deck from URL / YDKE…** (botão na aba **Decklist**) — busca a URL (ou decodifica o código YDKE) uma
+   >   única vez e salva o resultado como um `.ydk` normal na pasta de decklists, assim você pode usá-lo como um deck de
+   >   arquivo comum.
+   > - **Fonte de deck por jogador** — cada jogador (Player 1, mais Player 2 no modo de dois jogadores) escolhe sua
+   >   própria fonte: **Deck files** (os seletores habituais), **URL** (buscada ao vivo no Start DRAW) ou **YDKE code**.
+   >   As fontes podem ser combinadas, ex.: Player 1 a partir de uma URL e Player 2 a partir de arquivos. Em caso de
+   >   qualquer falha de URL/YDKE, aquele jogador simplesmente começa sem filtro de deck.
+   >
+   > Formatos de resposta aceitos pelo servidor: um código `ydke://`; array JSON de IDs de carta (passcodes); objeto JSON
+   > `{ "main": [...], "extra": [...], "side": [...] }`; texto `.ydk` bruto; ou texto simples contendo IDs numéricos.
+   >
+   > Um cabeçalho de autenticação opcional (nome + valor, ex.: `Authorization` / `Bearer …`) pode ser configurado e
+   > é enviado com cada requisição.
+   >
+   > ⚠️ As URLs e o valor do cabeçalho são armazenados em texto simples no QSettings, como todas as outras
+   > configurações do plugin — evite armazenar segredos de longa duração ali.
+
+   > 💡 O plugin também pode **exportar as informações das cartas detectadas para arquivos** para que você possa
+   > exibi-las em qualquer lugar — uma fonte de texto do OBS que o streamer lê ao vivo, bots, ou overlays
+   > HTML/navegador. Vem **desativado por padrão** — ative *Export detected card info to files* nas configurações
+   > do Draw 2 (*Feature flags*) e reinicie o DRAW. Enquanto está em execução, cada detector escreve em
+   > `plugin_config/draw2-plugin/state/` (por jogador `N`):
+   > - `current_pN.json` — cartas atualmente na tela:
+   >   `{ "updated_at", "channel", "cards": [ { "id", "name", "type", "attribute", "race", "atk", "def", "desc" } ] }`
+   >   (os campos enriquecidos vêm do YGOPRODeck; os campos ausentes são omitidos).
+   > - `events_pN.jsonl` — log somente de adição, um JSON por linha:
+   >   `{ "ts", "event": "appeared" | "disappeared", "card": { … } }`.
+   > - `current_card_pN.txt` — texto simples, os nomes das cartas na tela (separados por quebras de linha). Aponte uma
+   >   fonte **Text** do OBS para este arquivo (*Read from file*) para exibir a carta atual ao vivo.
+   >
+   > O idioma dos metadados é inglês por padrão; defina a chave `card_info_lang` no armazenamento de configurações do
+   > Draw 2 para um de `en` / `fr` / `de` / `it` / `pt` (o YGOPRODeck não fornece espanhol). A metade do backend vive
+   > no backend `draw2`; o plugin apenas o aponta para a pasta de saída.
+   >
+   > Por padrão, o backend baixa o banco de dados completo de cartas uma vez (em segundo plano) para que os metadados
+   > sejam resolvidos **offline**, sem requisições por carta. Desmarque **Download full card database for offline use**
+   > para pular o download e resolvê-los de forma preguiçosa, uma carta por vez.
 4. Clique no botão `Start DRAW` para começar o processo de detecção. O plugin irá começar a detectar cartas em tempo real
    e exibí-las na tela usando a fonte `Draw Display`. O plugin irá começar a detectar a partir do momento que você vir o botão `Stop DRAW`.
    Se não aparecer, algo deu errado.
