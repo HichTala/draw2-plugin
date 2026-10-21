@@ -231,11 +231,36 @@ Une fois le plugin installé et les poids du modèle téléchargés, vous pouvez
      montre le lancement exact du backend (chemins de deck résolus, canal, seuils) et chaque ligne du backend
      sans filtrage, et le journal OBS reçoit les détails de capture (source d'entrée, dimensions,
      recadrage). Pratique quand la détection ne se comporte pas comme prévu.
+   - **Activer la decklist distante** — permet à chaque joueur de charger son deck depuis une URL HTTP(S) ou un code YDKE au lieu d'un fichier `.ydk` local ; voir la note sous la source `Affichage Draw`.
 3. Le plugin fournit une nouvelle source appelée `Affichage DRAW`. Vous pouvez l'ajouter à votre scène comme n'importe
    quelle autre source.
    Cette source affichera les cartes détectées à l'écran. Vous pouvez choisir la source/scène à partir de laquelle
    détecter les cartes. Avec le mode deux joueurs activé, utilisez la propriété **Détecteur / Joueur** de la source pour choisir de quel détecteur elle
    lit (**Joueur 1** ou **Joueur 2**) ; ajoutez un `Affichage Draw` par joueur pour afficher les deux simultanément.
+
+   > 💡 Le plugin peut également charger une deck list depuis une **URL HTTP(S)** ou un **code YDKE** (`ydke://…`)
+   > plutôt qu'un fichier `.ydk` local — pratique lorsque votre liste de cartes est servie par une API distante ou un
+   > système de gestion de tournoi, ou partagée sous forme de lien YDKE. Cette fonctionnalité est **désactivée par
+   > défaut** — activez **Activer la decklist distante** dans les paramètres de Draw 2 (onglet *Fonctionnalités*) ; les
+   > sources se configurent ensuite dans un onglet dédié **Decklist**.
+   >
+   > Deux modes sont disponibles une fois activé :
+   > - **Importer un deck depuis une URL / YDKE…** (bouton dans l'onglet **Decklist**) — récupère l'URL (ou décode le code
+   >   YDKE) une seule fois et enregistre le résultat comme un fichier `.ydk` normal dans le dossier des deck lists, vous
+   >   pouvez ainsi l'utiliser comme un deck fichier ordinaire.
+   > - **Source de deck par joueur** — chaque joueur (Joueur 1, plus Joueur 2 en mode deux joueurs) choisit sa propre
+   >   source : **Fichiers de deck** (les sélecteurs habituels), **URL** (récupérée en direct au clic sur Lancer DRAW) ou
+   >   **Code YDKE**. Les sources peuvent être combinées, p. ex. Joueur 1 depuis une URL et Joueur 2 depuis des fichiers.
+   >   En cas d'échec URL/YDKE, ce joueur démarre simplement sans filtre de deck.
+   >
+   > Formats de réponse acceptés : un code `ydke://` ; tableau JSON d'ID de carte (passcodes) ; objet JSON
+   > `{ "main": [...], "extra": [...], "side": [...] }` ; texte `.ydk` brut ; ou texte brut contenant des ID numériques.
+   >
+   > Un en-tête d'authentification optionnel (nom + valeur, p. ex. `Authorization` / `Bearer …`) peut être configuré
+   > et est envoyé avec chaque requête.
+   >
+   > ⚠️ Les URLs et la valeur de l'en-tête sont stockées en texte brut dans QSettings, comme tous les autres paramètres
+   > du plugin — évitez d'y placer des secrets à longue durée de vie.
 4. Cliquez sur le bouton `Lancer DRAW` pour lancer le processus de détection. Le plugin commencera à détecter les cartes
    en temps réel
    et les affichera à l'écran à l'aide de la source `Affichage Draw`. Le plugin commence la détection dès que le bouton

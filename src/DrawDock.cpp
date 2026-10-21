@@ -7,7 +7,9 @@
 
 #include "DrawDock.hpp"
 #include "SettingsDialog.hpp"
+#include "RemoteDeck.hpp"
 
+#include <QDir>
 #include <QSettings>
 #include <QFileInfo>
 #include <QStringList>
@@ -151,9 +153,82 @@ void DrawDock::StartChannel(int channel, const QString &python_exe)
 	// Per-player deck lists: player 1 uses deck_listN, player 2 deck_listN_p2.
 	QString sfx = (channel == 2) ? "_p2" : "";
 	QString dir = QString::fromUtf8(get_decklists_path()) + "/";
-	QString deck_list = dir + settings.value("deck_list1" + sfx, "").toString() + ";" + dir +
+
+	// Each player picks its own deck source (remote decklist on); with the
+	// feature off everyone uses deck files, exactly as before.
+	const int source = draw_feature_enabled(FEATURE_REMOTE_DECK) ? remote_deck::saved_source(settings, sfx)
+								     : remote_deck::SourceFiles;
+	QString deck_list;
+	if (source == remote_deck::SourceFiles) {
+		deck_list = dir + settings.value("deck_list1" + sfx, "").toString() + ";" + dir +
 			    settings.value("deck_list2" + sfx, "").toString() + ";" + dir +
 			    settings.value("deck_list3" + sfx, "").toString() + ";";
+	} else {
+		// A URL or a ydke:// code provides the whole deck. On any failure the
+		// player just starts with no deck filter rather than blocking the
+		// other detector.
+		const bool is_url = source == remote_deck::SourceUrl;
+		const QString value =
+			settings.value((is_url ? "deck_url1" : "deck_ydke") + sfx, "").toString().trimmed();
+		const QString what = is_url ? "remote deck" : "ydke deck";
+		QString path;
+		if (!value.isEmpty()) {
+			QString error;
+			QByteArray body;
+			QString ydk;
+			if (is_url) {
+				const QString header_name = settings.value("remote_header_name", "").toString();
+				const QString header_value = settings.value("remote_header_value", "").toString();
+				body = remote_deck::fetch(value, header_name, header_value, error);
+				ydk = body.isEmpty() ? QString() : remote_deck::to_ydk(body, error);
+			} else {
+				ydk = remote_deck::ydke_to_ydk(value, error);
+			}
+			if (ydk.isEmpty()) {
+				blog(LOG_ERROR, "Draw2: %s (P%d) failed: %s", what.toUtf8().constData(), channel,
+				     error.toUtf8().constData());
+				AppendLog(QString("✗ [P%1] %2 failed: %3 — no deck filter")
+						  .arg(channel)
+						  .arg(what)
+						  .arg(error));
+			} else {
+				QString remote_dir = QString::fromUtf8(get_decklists_path()) + "/.remote";
+				QDir().mkpath(remote_dir);
+				QString out_path = remote_dir + "/deck" + sfx + ".ydk";
+				if (!remote_deck::write_ydk(out_path, ydk)) {
+					blog(LOG_ERROR, "Draw2: could not write remote deck %s",
+					     out_path.toUtf8().constData());
+					AppendLog(QString("✗ [P%1] %2: write failed — no deck filter")
+							  .arg(channel)
+							  .arg(what));
+				} else {
+					path = out_path;
+					if (draw_feature_enabled(FEATURE_DEBUG)) {
+						int cards = 0;
+						for (const QString &ln : ydk.split('\n'))
+							if (!ln.trimmed().isEmpty() && ln.trimmed().at(0).isDigit())
+								cards++;
+						AppendLog(
+							QString("· [P%1] debug: %2 loaded from %3 (~%4 card IDs) → %5")
+								.arg(channel)
+								.arg(what)
+								.arg(is_url ? QString("%1 (%2 bytes)")
+										      .arg(value)
+										      .arg(body.size())
+									    : QString("ydke code"))
+								.arg(cards)
+								.arg(out_path));
+					}
+				}
+			}
+		} else if (draw_feature_enabled(FEATURE_DEBUG)) {
+			AppendLog(QString("· [P%1] debug: %2 selected but empty — no deck filter")
+					  .arg(channel)
+					  .arg(is_url ? "URL source" : "ydke source"));
+		}
+		// One deck goes in the first slot; remaining slots stay empty.
+		deck_list = path + ";;;";
+	}
 
 	auto *process = new QProcess(this);
 	process->setProcessChannelMode(QProcess::MergedChannels);
