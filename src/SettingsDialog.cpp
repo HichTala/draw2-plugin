@@ -7,6 +7,7 @@
 #include <QLabel>
 #include <QMessageBox>
 #include <QSettings>
+#include <QStackedWidget>
 #include <QTabWidget>
 
 #include "SettingsDialog.hpp"
@@ -76,6 +77,10 @@ SettingsDialog::SettingsDialog(QWidget *parent) : QDialog(parent)
 	bool feature_remote_deck_value = settings.value("feature_remote_deck", false).toBool();
 	QString deck_url1_v = settings.value("deck_url1", "").toString();
 	QString deck_url1_p2_v = settings.value("deck_url1_p2", "").toString();
+	QString deck_ydke_v = settings.value("deck_ydke", "").toString();
+	QString deck_ydke_p2_v = settings.value("deck_ydke_p2", "").toString();
+	int deck_source_v = remote_deck::saved_source(settings, "");
+	int deck_source_p2_v = remote_deck::saved_source(settings, "_p2");
 	QString remote_header_name_v = settings.value("remote_header_name", "").toString();
 	QString remote_header_value_v = settings.value("remote_header_value", "").toString();
 
@@ -128,7 +133,7 @@ SettingsDialog::SettingsDialog(QWidget *parent) : QDialog(parent)
 	layout->addLayout(confidence_layout);
 	layout->addStretch();
 
-	// --- Decklist tab: deck files (per player) OR a remote URL per player. ---
+	// --- Decklist tab: per player, deck files OR (remote on) a URL / ydke code. ---
 	auto *decklist_page = new QWidget();
 	auto *decklist_tab_layout = new QVBoxLayout(decklist_page);
 
@@ -148,67 +153,70 @@ SettingsDialog::SettingsDialog(QWidget *parent) : QDialog(parent)
 			combos[i]->setCurrentIndex(idx);
 	}
 
-	// File selectors: hidden while remote decklist is on.
-	auto *file_layout = new QVBoxLayout(this->file_section);
-	file_layout->setContentsMargins(0, 0, 0, 0);
-
 	auto *browse_layout = new QHBoxLayout();
 	auto *label = new QLabel(obs_module_text("deck_list"), this);
 	browse_layout->addWidget(label);
 	this->browse_button->setMaximumWidth(125);
 	browse_layout->addWidget(this->browse_button);
-	file_layout->addLayout(browse_layout);
+	decklist_tab_layout->addLayout(browse_layout);
 
-	auto *p1_label = new QLabel(obs_module_text("player_1"), this);
-	file_layout->addWidget(p1_label);
-	auto *decklist_layout = new QHBoxLayout();
-	decklist_layout->addWidget(this->deck_list1);
-	decklist_layout->addWidget(this->deck_list2);
-	decklist_layout->addWidget(this->deck_list3);
-	file_layout->addLayout(decklist_layout);
+	// One block per player: a source picker (shown only when remote decklist
+	// is on) and a stacked page with the matching input — the 3 deck files, a
+	// URL or a ydke:// code. Each player picks independently.
+	auto build_player = [this](QVBoxLayout *parent, const char *title, QComboBox *source, QStackedWidget *stack,
+				   QComboBox *const files[3], QLineEdit *url, const QString &url_v, QLineEdit *ydke,
+				   const QString &ydke_v, int source_v) {
+		auto *header = new QHBoxLayout();
+		header->addWidget(new QLabel(obs_module_text(title), this));
+		source->addItem(obs_module_text("deck_source_files"));
+		source->addItem(obs_module_text("deck_source_url"));
+		source->addItem(obs_module_text("deck_source_ydke"));
+		source->setCurrentIndex(source_v);
+		header->addWidget(source);
+		header->addStretch();
+		parent->addLayout(header);
 
-	// Player 2 deck lists: shown only when two-player mode is enabled (toggle
-	// lives in the Feature flags tab).
+		auto *files_page = new QWidget();
+		auto *files_layout = new QHBoxLayout(files_page);
+		files_layout->setContentsMargins(0, 0, 0, 0);
+		for (int i = 0; i < 3; i++)
+			files_layout->addWidget(files[i]);
+		url->setText(url_v);
+		url->setPlaceholderText(obs_module_text("remote_url_ph"));
+		ydke->setText(ydke_v);
+		ydke->setPlaceholderText(obs_module_text("ydke_ph"));
+		stack->addWidget(files_page);
+		stack->addWidget(url);
+		stack->addWidget(ydke);
+		// Keep the row compact instead of soaking up the tab's spare height.
+		stack->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Fixed);
+		parent->addWidget(stack);
+
+		connect(source, &QComboBox::currentIndexChanged, this, [this] { UpdateDeckSourceVisibility(); });
+	};
+
+	QComboBox *const files_p1[3] = {this->deck_list1, this->deck_list2, this->deck_list3};
+	build_player(decklist_tab_layout, "player_1", this->deck_source, this->deck_stack, files_p1, this->deck_url1,
+		     deck_url1_v, this->deck_ydke, deck_ydke_v, deck_source_v);
+
+	// Player 2: shown only when two-player mode is enabled (toggle lives in
+	// the Feature flags tab).
 	auto *p2_layout = new QVBoxLayout(this->player2_section);
 	p2_layout->setContentsMargins(0, 0, 0, 0);
-	auto *p2_label = new QLabel(obs_module_text("player_2"), this);
-	p2_layout->addWidget(p2_label);
-	auto *decklist_layout_p2 = new QHBoxLayout();
-	decklist_layout_p2->addWidget(this->deck_list1_p2);
-	decklist_layout_p2->addWidget(this->deck_list2_p2);
-	decklist_layout_p2->addWidget(this->deck_list3_p2);
-	p2_layout->addLayout(decklist_layout_p2);
+	QComboBox *const files_p2[3] = {this->deck_list1_p2, this->deck_list2_p2, this->deck_list3_p2};
+	build_player(p2_layout, "player_2", this->deck_source_p2, this->deck_stack_p2, files_p2, this->deck_url1_p2,
+		     deck_url1_p2_v, this->deck_ydke_p2, deck_ydke_p2_v, deck_source_p2_v);
 	this->player2_section->setVisible(feature_channel_value);
-	file_layout->addWidget(this->player2_section);
+	decklist_tab_layout->addWidget(this->player2_section);
 
-	this->file_section->setVisible(!feature_remote_deck_value);
-	decklist_tab_layout->addWidget(this->file_section);
-
-	// Remote decklist section: one URL per player, replacing the file
-	// selectors. Shown only when the feature is on (toggle in Feature flags).
+	// Shared remote settings (auth header for URL sources) and the one-off
+	// importer. Shown only when the feature is on (toggle in Feature flags).
 	{
 		auto *remote_layout = new QVBoxLayout(this->remote_section);
 		remote_layout->setContentsMargins(0, 0, 0, 0);
 
 		auto *remote_label = new QLabel(obs_module_text("remote_deck_section"), this);
 		remote_layout->addWidget(remote_label);
-
-		this->deck_url1->setText(deck_url1_v);
-		this->deck_url1->setPlaceholderText(obs_module_text("remote_url_ph"));
-		auto *p1_url_layout = new QHBoxLayout();
-		p1_url_layout->addWidget(new QLabel(obs_module_text("player_1"), this));
-		p1_url_layout->addWidget(this->deck_url1);
-		remote_layout->addLayout(p1_url_layout);
-
-		// Player 2 URL: shown only when two-player mode is enabled.
-		auto *p2_url_layout = new QHBoxLayout(this->remote_p2_row);
-		p2_url_layout->setContentsMargins(0, 0, 0, 0);
-		this->deck_url1_p2->setText(deck_url1_p2_v);
-		this->deck_url1_p2->setPlaceholderText(obs_module_text("remote_url_ph"));
-		p2_url_layout->addWidget(new QLabel(obs_module_text("player_2"), this));
-		p2_url_layout->addWidget(this->deck_url1_p2);
-		this->remote_p2_row->setVisible(feature_channel_value);
-		remote_layout->addWidget(this->remote_p2_row);
 
 		this->remote_header_name->setText(remote_header_name_v);
 		this->remote_header_name->setPlaceholderText(obs_module_text("remote_header_name_ph"));
@@ -221,7 +229,6 @@ SettingsDialog::SettingsDialog(QWidget *parent) : QDialog(parent)
 
 		remote_layout->addWidget(this->import_url_button);
 	}
-	this->remote_section->setVisible(feature_remote_deck_value);
 	decklist_tab_layout->addWidget(this->remote_section);
 	decklist_tab_layout->addStretch();
 
@@ -260,21 +267,28 @@ SettingsDialog::SettingsDialog(QWidget *parent) : QDialog(parent)
 	connect(browse_button, SIGNAL(clicked()), SLOT(BrowseButtonClicked()));
 	connect(ok_button, SIGNAL(clicked()), SLOT(OkButtonClicked()));
 	connect(cancel_button, SIGNAL(clicked()), SLOT(CancelButtonClicked()));
-	// Two-player toggle reveals the Player 2 deck file row and remote URL row.
-	connect(this->feature_channel, &QCheckBox::toggled, this, [this](bool on) {
-		this->player2_section->setVisible(on);
-		this->remote_p2_row->setVisible(on);
-	});
-	// Remote toggle swaps the file selectors for the URL fields.
-	connect(this->feature_remote_deck, &QCheckBox::toggled, this, [this](bool on) {
-		this->file_section->setVisible(!on);
-		this->remote_section->setVisible(on);
-	});
+	// Two-player toggle reveals the Player 2 deck block.
+	connect(this->feature_channel, &QCheckBox::toggled, this->player2_section, &QWidget::setVisible);
+	// Remote toggle reveals the per-player source pickers and remote settings.
+	connect(this->feature_remote_deck, &QCheckBox::toggled, this, [this] { UpdateDeckSourceVisibility(); });
 	connect(this->import_url_button, SIGNAL(clicked()), SLOT(ImportUrlButtonClicked()));
 	connect(this->confidence_slider, &QSlider::valueChanged,
 		[confidence_value_label](int value) { confidence_value_label->setText(QString::number(value) + "%"); });
 
+	UpdateDeckSourceVisibility();
 	resize(400, 50);
+}
+
+void SettingsDialog::UpdateDeckSourceVisibility()
+{
+	// With remote decklist off every player uses deck files (upstream
+	// behaviour); the saved source is kept for when it is turned back on.
+	const bool remote = this->feature_remote_deck->isChecked();
+	this->deck_source->setVisible(remote);
+	this->deck_source_p2->setVisible(remote);
+	this->deck_stack->setCurrentIndex(remote ? this->deck_source->currentIndex() : remote_deck::SourceFiles);
+	this->deck_stack_p2->setCurrentIndex(remote ? this->deck_source_p2->currentIndex() : remote_deck::SourceFiles);
+	this->remote_section->setVisible(remote);
 }
 
 void SettingsDialog::PythonBrowseButtonClicked()
@@ -313,6 +327,10 @@ void SettingsDialog::OkButtonClicked()
 	settings.setValue("feature_remote_deck", this->feature_remote_deck->isChecked());
 	settings.setValue("deck_url1", this->deck_url1->text());
 	settings.setValue("deck_url1_p2", this->deck_url1_p2->text());
+	settings.setValue("deck_source", this->deck_source->currentIndex());
+	settings.setValue("deck_source_p2", this->deck_source_p2->currentIndex());
+	settings.setValue("deck_ydke", this->deck_ydke->text().trimmed());
+	settings.setValue("deck_ydke_p2", this->deck_ydke_p2->text().trimmed());
 	settings.setValue("remote_header_name", this->remote_header_name->text());
 	settings.setValue("remote_header_value", this->remote_header_value->text());
 	this->close();
@@ -336,10 +354,16 @@ void SettingsDialog::ImportUrlButtonClicked()
 	if (!ok || name.trimmed().isEmpty())
 		return;
 
+	// A ydke:// code is decoded directly; anything else is fetched as a URL.
 	QString error;
-	QByteArray body = remote_deck::fetch(url.trimmed(), this->remote_header_name->text(),
-					     this->remote_header_value->text(), error);
-	QString ydk = body.isEmpty() ? QString() : remote_deck::to_ydk(body, error);
+	QString ydk;
+	if (url.trimmed().startsWith("ydke://")) {
+		ydk = remote_deck::ydke_to_ydk(url, error);
+	} else {
+		QByteArray body = remote_deck::fetch(url.trimmed(), this->remote_header_name->text(),
+						     this->remote_header_value->text(), error);
+		ydk = body.isEmpty() ? QString() : remote_deck::to_ydk(body, error);
+	}
 
 	if (ydk.isEmpty()) {
 		QMessageBox::warning(this, obs_module_text("import_from_url"),

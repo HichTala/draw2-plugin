@@ -47,6 +47,21 @@ QString build_ydk(const QStringList &main, const QStringList &extra, const QStri
 	return out;
 }
 
+// Decode one base64 ydke section into passcodes. Returns false if malformed.
+bool ids_from_ydke_part(const QString &part, QStringList &ids)
+{
+	const auto decoded = QByteArray::fromBase64Encoding(part.toLatin1(), QByteArray::AbortOnBase64DecodingErrors);
+	const QByteArray &bytes = *decoded;
+	if (!decoded || bytes.size() % 4 != 0)
+		return false;
+	for (qsizetype i = 0; i < bytes.size(); i += 4) {
+		const quint32 id = (quint32)(uchar)bytes[i] | ((quint32)(uchar)bytes[i + 1] << 8) |
+				   ((quint32)(uchar)bytes[i + 2] << 16) | ((quint32)(uchar)bytes[i + 3] << 24);
+		ids << QString::number(id);
+	}
+	return true;
+}
+
 } // namespace
 
 namespace remote_deck {
@@ -58,6 +73,10 @@ QString to_ydk(const QByteArray &body, QString &error)
 		error = "empty response";
 		return QString();
 	}
+
+	// 0) A ydke:// code.
+	if (trimmed.startsWith("ydke://"))
+		return ydke_to_ydk(QString::fromLatin1(trimmed), error);
 
 	// 1) Try JSON.
 	QJsonParseError perr{};
@@ -118,6 +137,40 @@ QString to_ydk(const QByteArray &body, QString &error)
 		return QString();
 	}
 	return build_ydk(main, {}, {});
+}
+
+int saved_source(const QSettings &settings, const QString &sfx)
+{
+	const int legacy = settings.value("feature_remote_deck", false).toBool() ? SourceUrl : SourceFiles;
+	const int source = settings.value("deck_source" + sfx, legacy).toInt();
+	return (source >= SourceFiles && source <= SourceYdke) ? source : SourceFiles;
+}
+
+QString ydke_to_ydk(const QString &code, QString &error)
+{
+	const QString c = code.trimmed();
+	if (!c.startsWith("ydke://")) {
+		error = "not a ydke:// code";
+		return QString();
+	}
+	// main!extra!side! — the trailing "!" is conventional but tolerated if missing.
+	const QStringList parts = c.mid(7).split('!');
+	if (parts.size() < 3 || parts.size() > 4 || (parts.size() == 4 && !parts[3].isEmpty())) {
+		error = "malformed ydke code";
+		return QString();
+	}
+	QStringList sections[3];
+	for (int i = 0; i < 3; i++) {
+		if (!ids_from_ydke_part(parts[i], sections[i])) {
+			error = "malformed ydke code";
+			return QString();
+		}
+	}
+	if (sections[0].isEmpty() && sections[1].isEmpty() && sections[2].isEmpty()) {
+		error = "no card IDs found";
+		return QString();
+	}
+	return build_ydk(sections[0], sections[1], sections[2]);
 }
 
 bool write_ydk(const QString &path, const QString &ydk)

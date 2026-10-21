@@ -220,24 +220,27 @@ Quando o plugin está instalado e os "model weights" estão baixados, você pode
      o lançamento exato do backend (caminhos de deck resolvidos, canal, limites) e cada linha do backend sem
      filtro, e o log do OBS recebe os detalhes de captura (fonte de entrada, dimensões, recorte). Útil
      quando a detecção não está se comportando como esperado.
-   - **Enable remote decklist** — carrega um deck a partir de uma URL HTTP(S) em vez de um arquivo `.ydk` local; veja a nota abaixo da fonte `Draw Display`.
+   - **Enable remote decklist** — permite que cada jogador carregue seu deck a partir de uma URL HTTP(S) ou de um código YDKE em vez de um arquivo `.ydk` local; veja a nota abaixo da fonte `Draw Display`.
 3. O plugin irá fornecer uma nova fonte chamada `Draw Display`. Você pode adicioná-la a sua cena como qualquer outra fonte.
    Essa fonte irá exibir as cartas detectadas na tela. Você pode escolher de qual fonte/cena detectar as cartas.
    Com o modo de dois jogadores ativado, use a propriedade **Detector / Player** da fonte para escolher de qual detector ela lê (**Player 1** ou **Player 2**); adicione um `Draw Display` por jogador para exibir ambos ao mesmo tempo.
 
-   > 💡 O plugin também pode carregar uma decklist a partir de uma **URL HTTP(S)** em vez de um arquivo `.ydk` local —
-   > útil quando sua lista de cartas é servida por uma API remota ou sistema de gerenciamento de torneios. Vem
-   > **desativada por padrão** — ative **Enable remote decklist** nas configurações do Draw 2 (*Recursos avançados*);
-   > as URLs são configuradas depois em uma aba dedicada **Decklist**.
+   > 💡 O plugin também pode carregar uma decklist a partir de uma **URL HTTP(S)** ou de um **código YDKE** (`ydke://…`)
+   > em vez de um arquivo `.ydk` local — útil quando sua lista de cartas é servida por uma API remota ou sistema de
+   > gerenciamento de torneios, ou compartilhada como link YDKE. Vem **desativada por padrão** — ative **Enable remote
+   > decklist** nas configurações do Draw 2 (*Recursos avançados*); as fontes são configuradas depois em uma aba
+   > dedicada **Decklist**.
    >
    > Dois modos estão disponíveis após a ativação:
-   > - **Import deck from URL…** (botão na aba **Decklist**) — busca a URL uma única vez e salva o resultado como um
-   >   `.ydk` normal na pasta de decklists, assim você pode usá-lo como um deck de arquivo comum.
-   > - **Campo de URL por jogador** — uma URL por jogador (Player 1, mais Player 2 no modo de dois jogadores). Enquanto a
-   >   opção remota está ativa, eles substituem os seletores de arquivo; a URL é buscada ao vivo no Start DRAW. Em caso de
-   >   qualquer falha, aquele jogador simplesmente começa sem filtro de deck.
+   > - **Import deck from URL / YDKE…** (botão na aba **Decklist**) — busca a URL (ou decodifica o código YDKE) uma
+   >   única vez e salva o resultado como um `.ydk` normal na pasta de decklists, assim você pode usá-lo como um deck de
+   >   arquivo comum.
+   > - **Fonte de deck por jogador** — cada jogador (Player 1, mais Player 2 no modo de dois jogadores) escolhe sua
+   >   própria fonte: **Deck files** (os seletores habituais), **URL** (buscada ao vivo no Start DRAW) ou **YDKE code**.
+   >   As fontes podem ser combinadas, ex.: Player 1 a partir de uma URL e Player 2 a partir de arquivos. Em caso de
+   >   qualquer falha de URL/YDKE, aquele jogador simplesmente começa sem filtro de deck.
    >
-   > Formatos de resposta aceitos pelo servidor: array JSON de IDs de carta (passcodes); objeto JSON
+   > Formatos de resposta aceitos pelo servidor: um código `ydke://`; array JSON de IDs de carta (passcodes); objeto JSON
    > `{ "main": [...], "extra": [...], "side": [...] }`; texto `.ydk` bruto; ou texto simples contendo IDs numéricos.
    >
    > Um cabeçalho de autenticação opcional (nome + valor, ex.: `Authorization` / `Bearer …`) pode ser configurado e

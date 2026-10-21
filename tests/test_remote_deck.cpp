@@ -74,6 +74,29 @@ int main()
 	check_true("ydk_passthrough_no_ids_is_error",
 		   to_ydk(QByteArray("#main\n#extra\n!side\n"), err).isEmpty() && !err.isEmpty());
 
+	// ydke:// code -> main/extra/side (little-endian uint32 passcodes).
+	using remote_deck::ydke_to_ydk;
+	check_eq("ydke_sections", ydke_to_ydk("ydke://o6lXBaOpVwWu9MwC!viOnAg==!ryPeAA==!", err),
+		 QString("#main\n89631139\n89631139\n46986414\n#extra\n44508094\n!side\n14558127\n"));
+
+	// ydke with empty extra/side and no trailing "!".
+	check_eq("ydke_main_only", ydke_to_ydk("ydke://o6lXBQ==!!", err),
+		 QString("#main\n89631139\n#extra\n!side\n"));
+
+	// An endpoint may also answer with a ydke code.
+	check_eq("ydke_as_body", to_ydk(QByteArray("  ydke://o6lXBQ==!!!\n"), err),
+		 QString("#main\n89631139\n#extra\n!side\n"));
+
+	// Malformed ydke codes are errors.
+	err.clear();
+	check_true("ydke_missing_sections_is_error", ydke_to_ydk("ydke://o6lXBQ==", err).isEmpty() && !err.isEmpty());
+	err.clear();
+	check_true("ydke_bad_base64_is_error", ydke_to_ydk("ydke://$$$$!!!", err).isEmpty() && !err.isEmpty());
+	err.clear();
+	check_true("ydke_not_multiple_of_4_is_error", ydke_to_ydk("ydke://o6lX!!!", err).isEmpty() && !err.isEmpty());
+	err.clear();
+	check_true("ydke_empty_is_error", ydke_to_ydk("ydke://!!!", err).isEmpty() && !err.isEmpty());
+
 	if (g_failures) {
 		std::fprintf(stderr, "\n%d failure(s)\n", g_failures);
 		return 1;
