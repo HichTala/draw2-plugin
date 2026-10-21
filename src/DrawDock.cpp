@@ -155,7 +155,7 @@ void DrawDock::StartChannel(int channel, const QString &python_exe)
 	QString dir = QString::fromUtf8(get_decklists_path()) + "/";
 
 	// Each player picks its own deck source (remote decklist on); with the
-	// feature off everyone uses deck files, exactly as upstream.
+	// feature off everyone uses deck files, exactly as before.
 	const int source = draw_feature_enabled(FEATURE_REMOTE_DECK) ? remote_deck::saved_source(settings, sfx)
 								     : remote_deck::SourceFiles;
 	QString deck_list;

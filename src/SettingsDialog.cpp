@@ -281,7 +281,7 @@ SettingsDialog::SettingsDialog(QWidget *parent) : QDialog(parent)
 
 void SettingsDialog::UpdateDeckSourceVisibility()
 {
-	// With remote decklist off every player uses deck files (upstream
+	// With remote decklist off every player uses deck files (previous
 	// behaviour); the saved source is kept for when it is turned back on.
 	const bool remote = this->feature_remote_deck->isChecked();
 	this->deck_source->setVisible(remote);
