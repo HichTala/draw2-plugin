@@ -80,8 +80,7 @@ int main()
 		 QString("#main\n89631139\n89631139\n46986414\n#extra\n44508094\n!side\n14558127\n"));
 
 	// ydke with empty extra/side and no trailing "!".
-	check_eq("ydke_main_only", ydke_to_ydk("ydke://o6lXBQ==!!", err),
-		 QString("#main\n89631139\n#extra\n!side\n"));
+	check_eq("ydke_main_only", ydke_to_ydk("ydke://o6lXBQ==!!", err), QString("#main\n89631139\n#extra\n!side\n"));
 
 	// An endpoint may also answer with a ydke code.
 	check_eq("ydke_as_body", to_ydk(QByteArray("  ydke://o6lXBQ==!!!\n"), err),
