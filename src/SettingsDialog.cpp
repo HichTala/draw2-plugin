@@ -156,7 +156,7 @@ SettingsDialog::SettingsDialog(QWidget *parent) : QDialog(parent)
 	auto *browse_layout = new QHBoxLayout();
 	auto *label = new QLabel(obs_module_text("deck_list"), this);
 	browse_layout->addWidget(label);
-	this->browse_button->setMaximumWidth(125);
+	this->browse_button->setMaximumWidth(135);
 	browse_layout->addWidget(this->browse_button);
 	decklist_tab_layout->addLayout(browse_layout);
 
