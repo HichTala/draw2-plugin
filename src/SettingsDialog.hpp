@@ -44,6 +44,8 @@ private:
 	QCheckBox *feature_crop = new QCheckBox(obs_module_text("feature_crop"));
 	QCheckBox *feature_debug = new QCheckBox(obs_module_text("feature_debug"));
 	QCheckBox *feature_remote_deck = new QCheckBox(obs_module_text("feature_remote_deck"));
+	QCheckBox *feature_card_info = new QCheckBox(obs_module_text("feature_card_info"));
+	QCheckBox *feature_card_info_db = new QCheckBox(obs_module_text("feature_card_info_db"));
 	// Remote decklist (opt-in): each player picks its own deck source — files,
 	// a URL or a ydke:// code — so e.g. Player 1 can be remote and Player 2 local.
 	QComboBox *deck_source = new QComboBox();

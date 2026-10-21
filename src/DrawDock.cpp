@@ -10,6 +10,7 @@
 #include "RemoteDeck.hpp"
 
 #include <QDir>
+#include <QProcessEnvironment>
 #include <QSettings>
 #include <QFileInfo>
 #include <QStringList>
@@ -298,6 +299,29 @@ void DrawDock::StartChannel(int channel, const QString &python_exe)
 				  .arg(min_out)
 				  .arg(min_screen));
 		AppendLog(QString("· [P%1] debug: deck_list=%2").arg(channel).arg(deck_list));
+	}
+
+	// Opt-in: export structured card info to files (for OBS Text sources / bots /
+	// overlays). When off, set nothing so the backend behaves exactly as before.
+	if (draw_feature_enabled(FEATURE_CARD_INFO)) {
+		const char *state_dir = get_state_path();
+		if (state_dir) {
+			const QString lang = settings.value("card_info_lang", "en").toString();
+			// Full local card DB (offline) is on by default; the checkbox can
+			// turn it off so the backend resolves lazily, one card at a time.
+			const bool full_db = settings.value("feature_card_info_db", true).toBool();
+			QProcessEnvironment env = QProcessEnvironment::systemEnvironment();
+			env.insert("DRAW2_CARD_INFO_DIR", QString::fromUtf8(state_dir));
+			env.insert("DRAW2_CARD_INFO_LANG", lang);
+			env.insert("DRAW2_CARD_INFO_DB", full_db ? "1" : "0");
+			process->setProcessEnvironment(env);
+			if (draw_feature_enabled(FEATURE_DEBUG))
+				AppendLog(QString("· [P%1] debug: card info → %2 (lang=%3, full_db=%4)")
+						  .arg(channel)
+						  .arg(QString::fromUtf8(state_dir))
+						  .arg(lang)
+						  .arg(full_db ? "yes" : "no"));
+		}
 	}
 
 	process->start(python_exe, args);
