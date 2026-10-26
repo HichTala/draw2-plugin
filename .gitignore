@@ -7,6 +7,7 @@
 !/cmake
 !/data
 !/src
+!/tests
 !/extern
 !.clang-format
 !.gersemirc
@@ -26,3 +27,6 @@
 
 # Exclude CMake build number cache
 /cmake/.CMakeBuildNumber
+
+# Exclude test build artifacts
+tests/build/

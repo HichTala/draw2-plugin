@@ -31,6 +31,7 @@ bool draw_feature_enabled(const char *key);
 #define FEATURE_CHANNEL "feature_channel"
 #define FEATURE_CROP "feature_crop"
 #define FEATURE_DEBUG "feature_debug"
+#define FEATURE_REMOTE_DECK "feature_remote_deck"
 
 #ifdef __cplusplus
 }
