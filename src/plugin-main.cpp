@@ -70,3 +70,15 @@ const char *get_decklists_path()
 	}
 	return decklists_path;
 }
+
+const char *get_state_path()
+{
+	static char *state_path = nullptr;
+	if (!state_path) {
+		// e.g. ~/Library/Application Support/obs-studio/plugin_config/draw2-plugin/state
+		state_path = obs_module_config_path("state");
+		if (state_path)
+			os_mkdirs(state_path);
+	}
+	return state_path;
+}
