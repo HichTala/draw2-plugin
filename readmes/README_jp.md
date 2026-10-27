@@ -29,7 +29,7 @@ Pythonバックエンドのプロジェクトは[こちら](https://github.com/H
 ## <div align="center">📰 ニュース</div>
 
 > 🃏 **対応している最新の拡張機能:** `CORI` --- 最終更新日 `13-06-2026`  
-> 🔧 **最新版:** `0.2.1-beta` --- 最終更新日 `01-06-2026`
+> 🔧 **最新版:** `0.3.0-beta` --- 最終更新日 `27-10-2026`
 
 ---
 
@@ -42,7 +42,7 @@ OSに応じた手順に従ってセットアップしてください。
 <details open>
 <summary>🪟 Windows</summary>
 
-1. プラグインのインストーラーを[こちら](https://github.com/HichTala/draw2-plugin/releases/download/0.2.1/draw2-plugin-installer.exe)からダウンロードします。
+1. プラグインのインストーラーを[こちら](https://github.com/HichTala/draw2-plugin/releases/download/0.3.0/draw2-plugin-installer.exe)からダウンロードします。
 2. インストーラーを実行し、画面の指示に従ってください。
 3. インストールが完了したらOBS Studioを起動します。`Docks` メニューに `Draw 2` が表示されるので、有効化して好きな位置に配置します。
 
@@ -53,12 +53,12 @@ OSに応じた手順に従ってセットアップしてください。
 <details>
 <summary>🐧 Linux</summary>
 
-1. プラグインのインストーラーを[こちら](https://github.com/HichTala/draw2-plugin/releases/download/0.2.1/draw2-plugin-0.2.1-x86_64-linux-gnu.deb)からダウンロードします。
+1. プラグインのインストーラーを[こちら](https://github.com/HichTala/draw2-plugin/releases/download/0.3.0/draw2-plugin-0.3.0-x86_64-linux-gnu.deb)からダウンロードします。
 
 2. インストーラーをダブルクリックして「インストール」をクリックするか、次のコマンドを実行します。
 
    ```shell
-   sudo apt install ./draw2-plugin-0.2.1-x86_64-linux-gnu.deb
+   sudo apt install ./draw2-plugin-0.3.0-x86_64-linux-gnu.deb
    ```
 
 3. インストールが完了したらOBS Studioを起動します。`Docks` メニューに `Draw 2` が表示されます。ただし、インストールはまだ完了していません。プラグインはインストールされましたが、Pythonバックエンドのインストールが必要です。OBS Studioを閉じて、次の手順に進んでください。

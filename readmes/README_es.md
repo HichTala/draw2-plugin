@@ -35,13 +35,18 @@ bienvenidas!
 ## <div align="center">📰 Novedades</div>
 
 > 🃏 **Último pool de cartas:** `CORI` --- última actualización `13-06-2026`
-> 🔧 **Última versión de la app:** `0.2.1-beta` --- última actualización `01-06-2026`
+> 🔧 **Última versión de la app:** `0.3.0-beta` --- última actualización `27-10-2026`
 
 <table>
   <tr>
     <th>Fecha</th>
     <th>Tipo</th>
     <th>Descripción</th>
+  </tr>
+  <tr>
+    <td><b>27-10-2026</b></td>
+    <td>🔧 Versión de la app</td>
+    <td>Versión 0.3.0-beta publicada --- <a href="https://github.com/HichTala/draw2-plugin/releases/tag/0.3.0">ver notas de la versión</a></td>
   </tr>
   <tr> 
     <td><b>13-06-2026</b></td>
@@ -92,7 +97,7 @@ Sigue las instrucciones de instalación según tu sistema operativo para que tod
 <summary>🪟 Windows</summary>
 
 1. Descarga el instalador del plugin desde este
-   enlace: [DRAW2 Plugin Installer](https://github.com/HichTala/draw2-plugin/releases/download/0.2.1/draw2-plugin-installer.exe)
+   enlace: [DRAW2 Plugin Installer](https://github.com/HichTala/draw2-plugin/releases/download/0.3.0/draw2-plugin-installer.exe)
 2. Ejecuta el instalador y sigue las instrucciones en pantalla.
 3. Una vez completada la instalación, abre OBS Studio. Si todo está configurado correctamente, deberías ver en el
    menú `Docks` una nueva opción llamada `Draw 2`. Puedes activar el dock y colocarlo donde quieras.
@@ -105,12 +110,12 @@ Sigue las instrucciones de instalación según tu sistema operativo para que tod
 <summary>🐧 Linux</summary>
 
 1. Descarga el instalador del plugin desde este enlace:
-   [DRAW2 Plugin Installer](https://github.com/HichTala/draw2-plugin/releases/download/0.2.1/draw2-plugin-0.2.1-x86_64-linux-gnu.deb)
+   [DRAW2 Plugin Installer](https://github.com/HichTala/draw2-plugin/releases/download/0.3.0/draw2-plugin-0.3.0-x86_64-linux-gnu.deb)
 
 2. Ejecuta el instalador haciendo doble clic sobre él y pulsando instalar _O_ ejecutando el comando:
 
    ```shell
-   sudo apt install ./draw2-plugin-0.2.1-x86_64-linux-gnu.deb
+   sudo apt install ./draw2-plugin-0.3.0-x86_64-linux-gnu.deb
    ```
 
 3. Una vez completada la instalación, abre OBS Studio. Si todo está configurado correctamente, deberías ver en el
