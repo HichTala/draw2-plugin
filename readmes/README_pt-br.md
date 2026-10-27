@@ -35,13 +35,18 @@ Esse projeto é licenciado sob [GNU Affero General Public License v3.0](LICENCE)
 ## <div align="center">📰 News</div>
 
 > 🃏 **Latest card pool:** `CORI` --- last updated `13-06-2026`  
-> 🔧 **Latest app version:** `0.2.1-beta` --- last updated `01-06-2026`
+> 🔧 **Latest app version:** `0.3.0-beta` --- last updated `27-10-2026`
 
 <table>
   <tr>
     <th>Date</th>
     <th>Type</th>
     <th>Description</th>
+  </tr>
+  <tr>
+    <td><b>27-10-2026</b></td>
+    <td>🔧 App Update</td>
+    <td>Released version 0.3.0-beta --- <a href="https://github.com/HichTala/draw2-plugin/releases/tag/0.3.0">see release notes</a></td>
   </tr>
   <tr>
     <td><b>13-06-2026</b></td>
@@ -93,7 +98,7 @@ Siga a instrução de instalação dependendo do seu sistema operacional para qu
 <summary>🪟 Windows</summary>
 
 1. Baixe o instalador do plugin deste
-   link: [DRAW2 Plugin Installer](https://github.com/HichTala/draw2-plugin/releases/download/0.2.1/draw2-plugin-installer.exe)
+   link: [DRAW2 Plugin Installer](https://github.com/HichTala/draw2-plugin/releases/download/0.3.0/draw2-plugin-installer.exe)
 2. Execute o instalador e siga as instruções na tela.
 3. Assim que a instalação estiver concluída, execute o OBS Studio. Se tudo foi configurado corretamente,
    deve-se ver no menu `Painéis` uma nova opção chamada `Draw 2`.
@@ -106,12 +111,12 @@ Siga a instrução de instalação dependendo do seu sistema operacional para qu
 <summary>🐧 Linux</summary>
 
 1. Baixe o instalador do plugin deste link:
-   [DRAW2 Plugin Installer](https://github.com/HichTala/draw2-plugin/releases/download/0.2.1/draw2-plugin-0.2.1-x86_64-linux-gnu.deb)
+   [DRAW2 Plugin Installer](https://github.com/HichTala/draw2-plugin/releases/download/0.3.0/draw2-plugin-0.3.0-x86_64-linux-gnu.deb)
 
 2. Execute o instalador clicando duas vezes nele e depois em instalar _OU_ executando o comando:
 
    ```shell
-   sudo apt install ./draw2-plugin-0.2.1-x86_64-linux-gnu.deb
+   sudo apt install ./draw2-plugin-0.3.0-x86_64-linux-gnu.deb
    ```
 
 3. Assim que a instalação estiver concluída, execute o OBS Studio. Se tudo foi configurado corretamente, deve-se ver
