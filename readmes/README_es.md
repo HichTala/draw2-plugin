@@ -34,7 +34,7 @@ bienvenidas!
 
 ## <div align="center">📰 Novedades</div>
 
-> 🃏 **Último pool de cartas:** `CORI` --- última actualización `13-06-2026`
+> 🃏 **Último pool de cartas:** `BETB` --- última actualización `09-11-2026`
 > 🔧 **Última versión de la app:** `0.3.0-beta` --- última actualización `27-10-2026`
 
 <table>
@@ -42,6 +42,11 @@ bienvenidas!
     <th>Fecha</th>
     <th>Tipo</th>
     <th>Descripción</th>
+  </tr>
+  <tr> 
+    <td><b>13-06-2026</b></td>
+    <td>🃏 Pool de cartas</td>
+    <td>Pool de cartas actualizado --- ahora admite cartas hasta <i>Más allá de la Valentía</i></td>
   </tr>
   <tr>
     <td><b>27-10-2026</b></td>

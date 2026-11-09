@@ -34,7 +34,7 @@ Esse projeto é licenciado sob [GNU Affero General Public License v3.0](LICENCE)
 ---
 ## <div align="center">📰 News</div>
 
-> 🃏 **Latest card pool:** `CORI` --- last updated `13-06-2026`  
+> 🃏 **Latest card pool:** `BETB` --- last updated `09-11-2026`  
 > 🔧 **Latest app version:** `0.3.0-beta` --- last updated `27-10-2026`
 
 <table>
@@ -42,6 +42,11 @@ Esse projeto é licenciado sob [GNU Affero General Public License v3.0](LICENCE)
     <th>Date</th>
     <th>Type</th>
     <th>Description</th>
+  </tr>
+  <tr>
+    <td><b>09-11-2026</b></td>
+    <td>🃏 Card Pool</td>
+    <td>Card pool updated --- now supports cards up to <i>Beyond the Brave</i></td>
   </tr>
   <tr>
     <td><b>27-10-2026</b></td>
