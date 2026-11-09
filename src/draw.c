@@ -155,6 +155,8 @@ void draw_source_video_render(void *data, gs_effect_t *effect)
 			gs_texrender_destroy(context->render);
 		context->render = gs_texrender_create(GS_RGBA, GS_ZS_NONE);
 		obs_leave_graphics();
+		context->source_width = width;
+		context->source_height = height;
 	}
 
 	gs_texrender_reset(context->render);
