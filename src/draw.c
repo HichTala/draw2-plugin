@@ -105,7 +105,6 @@ void resolve_source(draw_source_data_t *context)
 		init_shared_memory(context);
 		obs_source_release(source);
 	}
-
 }
 void draw_source_video_render(void *data, gs_effect_t *effect)
 {
@@ -380,8 +379,9 @@ void draw_source_update(void *data, obs_data_t *settings)
 	// Files), so framing/crop issues are easy to spot.
 	if (draw_feature_enabled(FEATURE_DEBUG)) {
 		blog(LOG_INFO, "[draw2] debug: input='%s' source=%ux%u crop(l=%u t=%u r=%u b=%u) channel=%d",
-		     context->source_name ? context->source_name : "", context->source_width, context->source_height, context->crop_left,
-		     context->crop_top, context->crop_right, context->crop_bottom, context->channel);
+		     context->source_name ? context->source_name : "", context->source_width, context->source_height,
+		     context->crop_left, context->crop_top, context->crop_right, context->crop_bottom,
+		     context->channel);
 	}
 }
 
