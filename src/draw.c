@@ -80,10 +80,39 @@ void draw_source_get_defaults(obs_data_t *settings)
 	obs_data_set_default_bool(settings, "preview_input", false);
 }
 
+void switch_source(draw_source_data_t *context, obs_source_t *source)
+{
+	if (context->source) {
+		obs_source_t *prev_source = obs_weak_source_get_source(context->source);
+		if (prev_source) {
+			obs_source_release(prev_source);
+		}
+		obs_weak_source_release(context->source);
+	}
+	context->source = obs_source_get_weak_source(source);
+}
+void resolve_source(draw_source_data_t *context)
+{
+	if (!context->source_name || !*context->source_name)
+		return;
+	obs_source_t *source = obs_get_source_by_name(context->source_name);
+	if (source) {
+		if (!obs_weak_source_references_source(context->source, source)) {
+			switch_source(context, source);
+		}
+		context->source_width = obs_source_get_width(source);
+		context->source_height = obs_source_get_height(source);
+		init_shared_memory(context);
+		obs_source_release(source);
+	}
+
+}
 void draw_source_video_render(void *data, gs_effect_t *effect)
 {
 	UNUSED_PARAMETER(effect);
 	draw_source_data_t *context = data;
+	if (!context->source)
+		resolve_source(context);
 	if (!context->source)
 		return;
 
@@ -311,17 +340,6 @@ obs_properties_t *draw_source_get_properties(void *data)
 	return props;
 }
 
-void switch_source(draw_source_data_t *context, obs_source_t *source)
-{
-	if (context->source) {
-		obs_source_t *prev_source = obs_weak_source_get_source(context->source);
-		if (prev_source) {
-			obs_source_release(prev_source);
-		}
-		obs_weak_source_release(context->source);
-	}
-	context->source = obs_source_get_weak_source(source);
-}
 void draw_source_update(void *data, obs_data_t *settings)
 {
 	draw_source_data_t *context = data;
@@ -352,23 +370,15 @@ void draw_source_update(void *data, obs_data_t *settings)
 	}
 	// To use if preview interfere with detection in the future
 	// draw_dock_set_preview(context, context->preview_input);
-	const char *source_name = obs_data_get_string(settings, "input_selection");
-	obs_source_t *source = obs_get_source_by_name(source_name);
-	if (source) {
-		if (!obs_weak_source_references_source(context->source, source)) {
-			switch_source(context, source);
-		}
-		context->source_width = obs_source_get_width(source);
-		context->source_height = obs_source_get_height(source);
-		init_shared_memory(context);
-		obs_source_release(source);
-	}
+	bfree(context->source_name);
+	context->source_name = bstrdup(obs_data_get_string(settings, "input_selection"));
+	resolve_source(context);
 
 	// Debug mode: log the resolved capture config to the OBS log (Help > Log
 	// Files), so framing/crop issues are easy to spot.
 	if (draw_feature_enabled(FEATURE_DEBUG)) {
 		blog(LOG_INFO, "[draw2] debug: input='%s' source=%ux%u crop(l=%u t=%u r=%u b=%u) channel=%d",
-		     source_name ? source_name : "", context->source_width, context->source_height, context->crop_left,
+		     context->source_name ? context->source_name : "", context->source_width, context->source_height, context->crop_left,
 		     context->crop_top, context->crop_right, context->crop_bottom, context->channel);
 	}
 }

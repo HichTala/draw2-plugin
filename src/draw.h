@@ -30,6 +30,7 @@ struct draw_source_data {
 	bool preview_input;
 
 	obs_weak_source_t *source;
+	char *source_name;
 
 	void *region;
 	void *shared_frame;
