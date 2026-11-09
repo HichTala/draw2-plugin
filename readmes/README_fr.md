@@ -36,7 +36,7 @@ bienvenues.
 ---
 ## <div align="center">📰 News</div>
 
-> 🃏 **Dernière extension supportée:** `CORI` --- mise à jour le `13-06-2026`  
+> 🃏 **Dernière extension supportée:** `BETB` --- mise à jour le `09-11-2026`  
 > 🔧 **Dernière version:** `0.3.0-beta` --- mise à jour le `27-10-2026`
 
 <table>
@@ -44,6 +44,11 @@ bienvenues.
     <th>Date</th>
     <th>Type</th>
     <th>Description</th>
+  </tr>
+  <tr>
+    <td><b>09-11-2026</b></td>
+    <td>🃏 Pool de cartes</td>
+    <td>Mise à jour du pool de cartes --- prend désormais en charge les cartes jusqu'à <i>Au-Delà du Courage</i></td>
   </tr>
   <tr>
     <td><b>27-10-2026</b></td>
